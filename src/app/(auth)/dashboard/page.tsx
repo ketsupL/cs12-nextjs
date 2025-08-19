@@ -1,13 +1,16 @@
-"use client"
+"use client";
 
 import { useAuth } from "@/hooks/auth";
-
+import { useCustomers } from "@/hooks/useCustomers";
+import axios from "@/lib/axios";
+import useSWR from "swr";
 
 export default function Home() {
-  const {} = useAuth({middleware:'auth'})
-
-  return (<>
-    <div className="text-5xl">Tis Logged In</div>
-  </>
+  const { customers } = useCustomers();
+  console.log(customers)
+  return (
+    <>
+      <div className="text-5xl">Tis Logged In</div>
+    </>
   );
 }

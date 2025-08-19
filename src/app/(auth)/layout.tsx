@@ -1,9 +1,11 @@
+'use client'
 import { AppSidebar } from "@/components/layouts/admin/app-sidebar";
 import { SiteHeader } from "@/components/layouts/admin/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/auth";
 
 export default function Page({ children }: { children: React.ReactNode }) {
+  useAuth({middleware:'auth',redirectIfAuthenticated:'/'})
   return (
     <SidebarProvider
       style={

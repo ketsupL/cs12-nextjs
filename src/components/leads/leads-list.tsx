@@ -1,0 +1,241 @@
+"use client";
+
+import React, { useState } from "react";
+import { Phone, Mail, Edit, Trash2, UserCheck, Building } from "lucide-react";
+import { Lead } from "@/types/leads";
+import { LEAD_STATUSES } from "@/types/leads";
+import { AddLeadForm, EditLeadForm } from "./index";
+import Link from "next/link";
+import {
+  DataTableV2,
+  type DataTableColumn,
+  type DataTableAction,
+  type DataTableBatchAction,
+} from "@/components/ui/data-table-v2";
+import { Badge } from "@/components/ui/badge";
+import { useLeads } from "@/hooks/useLeads";
+
+export function LeadsList() {
+  const {
+    leads,
+    currentPage,
+    setCurrentPage,
+    sortConfig,
+    searchTerm,
+    setSearchTerm,
+    loading,
+    refreshLeads,
+    handleDeleteLead,
+    setPerPage,
+    handleConvertLead,
+    setSortConfig,
+    perPage,
+    totalCount,
+  } = useLeads();
+
+  const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+  const [isEditLeadOpen, setIsEditLeadOpen] = useState<Lead | false>(false);
+
+  // Get status badge component
+  const getStatusBadge = (status: string) => {
+    const statusConfig = LEAD_STATUSES.find((s) => s.value === status);
+    if (!statusConfig) return <Badge variant="secondary">{status}</Badge>;
+
+    return (
+      <Badge variant="secondary" className={statusConfig.color}>
+        {statusConfig.label}
+      </Badge>
+    );
+  };
+
+  // Column configuration for DataTableV2
+  const columns: DataTableColumn<Lead>[] = [
+    {
+      key: "first_name",
+      label: "Name",
+      sortable: true,
+      render: (value: unknown, lead: Lead) => (
+        <div>
+          <Link
+            href={`/dashboard/leads/${lead.id}`}
+            className="hover:underline font-medium"
+          >
+            {lead.first_name + " " + lead.last_name}
+          </Link>
+          {lead.company && (
+            <div className="text-sm text-muted-foreground flex items-center gap-1">
+              <Building className="h-3 w-3" />
+              {lead.company}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "email",
+      label: "Contact",
+      sortable: true,
+      render: (value: unknown, lead: Lead) => (
+        <div className="flex flex-col gap-1">
+          {lead.email && (
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">{lead.email}</span>
+            </div>
+          )}
+          {lead.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">{lead.phone}</span>
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      sortable: true,
+      render: (value: unknown) => getStatusBadge(value as string),
+    },
+    {
+      key: "source",
+      label: "Source",
+      sortable: true,
+      render: (value: unknown) => (
+        <span className="text-sm">{(value as string) || "N/A"}</span>
+      ),
+    },
+    {
+      key: "created_at",
+      label: "Created",
+      sortable: true,
+      render: (value: unknown) => (
+        <span className="text-sm">
+          {new Date(value as string).toLocaleDateString()}
+        </span>
+      ),
+    },
+  ];
+
+  // Action configuration for DataTableV2
+  const actions: DataTableAction<Lead>[] = [
+    {
+      icon: Edit,
+      label: "Edit Lead",
+      onClick: (lead: Lead) => setIsEditLeadOpen(lead),
+    },
+    {
+      icon: UserCheck,
+      label: "Convert to Customer",
+      onClick: async (lead: Lead) => {
+        if (
+          confirm("Are you sure you want to convert this lead to a customer?")
+        ) {
+          await handleConvertLead(lead.id);
+        }
+      },
+    },
+    {
+      icon: Trash2,
+      label: "Delete Lead",
+      onClick: async (lead: Lead) => {
+        if (confirm("Are you sure you want to delete this lead?")) {
+          await handleDeleteLead(lead.id);
+        }
+      },
+    },
+  ];
+
+  // Batch action configuration for DataTableV2
+  const batchActions: DataTableBatchAction<Lead>[] = [
+    {
+      icon: Trash2,
+      label: "Delete Leads",
+      onClick: (selectedIds: string[]) => {
+        console.log("Batch delete clicked for:", selectedIds);
+      },
+      show: (count: number) => count > 0,
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Leads</h1>
+            <p className="text-muted-foreground">
+              Manage your sales leads and convert them to customers
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Add Lead Form */}
+      <AddLeadForm
+        open={isAddLeadOpen}
+        onOpenChange={setIsAddLeadOpen}
+        onSuccess={() => {
+          setIsAddLeadOpen(false);
+          refreshLeads();
+        }}
+      />
+
+      {/* Edit Lead Form */}
+      {isEditLeadOpen && (
+        <EditLeadForm
+          lead={isEditLeadOpen}
+          open={!!isEditLeadOpen}
+          onOpenChange={() => setIsEditLeadOpen(false)}
+          onSuccess={() => {
+            setIsEditLeadOpen(false);
+            refreshLeads();
+          }}
+        />
+      )}
+
+      {/* Data Table */}
+      <DataTableV2<Lead>
+        data={leads}
+        columns={columns}
+        actions={actions}
+        batchActions={batchActions}
+        loading={loading}
+        loadingMessage="Loading leads..."
+        emptyMessage="No leads found. Add your first lead!"
+        searchPlaceholder="Search leads..."
+        idField="id"
+        searchable={true}
+        serverSide={true}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPerPage}
+        onSearchChange={setSearchTerm}
+        onSortChange={(sortKey, direction) => {
+          if (direction === null) {
+            setSortConfig([]);
+          } else {
+            setSortConfig([
+              {
+                key: sortKey as keyof Lead | "name",
+                columnName: sortKey,
+                sortBy: direction,
+              },
+            ]);
+          }
+        }}
+        searchTerm={searchTerm}
+        showAddButton={true}
+        addButtonLabel="Add Lead"
+        onAddClick={() => setIsAddLeadOpen(true)}
+        sortKey={sortConfig.length > 0 ? sortConfig[0].key as string : undefined}
+        sortDirection={sortConfig.length > 0 ? sortConfig[0].sortBy : undefined}
+        pagination={true}
+        pageSize={perPage}
+        pageSizeOptions={[10, 25, 50, 100]}
+      />
+    </div>
+  );
+}
