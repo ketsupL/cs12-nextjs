@@ -79,10 +79,13 @@ export default function DeleteCustomersByBatchForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose>Cancel</DialogClose>
+          <DialogClose>
+            <Button variant={'ghost'}>Cancel</Button>
+          </DialogClose>
           <Button
             onClick={handleDelete}
             disabled={isDeleting}
+            variant={"destructive"}
             className="bg-destructive"
           >
             {isDeleting ? "Deleting..." : "Delete"}

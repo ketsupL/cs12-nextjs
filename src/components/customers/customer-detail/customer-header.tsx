@@ -13,7 +13,6 @@ import type { Customer } from "@/types/database";
 import {
   Phone,
   Mail,
-  Building,
   Tag,
   Clock,
   Briefcase,
@@ -42,24 +41,15 @@ import { Separator } from "@/components/ui/separator";
 import { EditCustomerForm } from "@/components/customers/edit-customer-form";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { deleteCustomers } from "@/services/customers";
+import DeleteCustomerForm from "./delete-customer-form";
 
 interface CustomerHeaderProps {
   customer: Customer;
 }
 
 export function CustomerHeader({ customer }: CustomerHeaderProps) {
-  const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const getInitials = () => {
     return `${customer.first_name?.[0] || ""}${
@@ -81,25 +71,6 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
     setEditModalOpen(false);
     setEditingCustomer(null);
     window.location.reload();
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const response = await deleteCustomers(new Set([String(customer.id)]));
-      if (response.status === "success") {
-        toast.success("Customer deleted successfully");
-        router.push("/dashboard/customers");
-      } else {
-        toast.error(response.message || "Failed to delete customer");
-      }
-    } catch (error) {
-      console.error("Failed to delete customer:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setIsDeleting(false);
-      setDeleteDialogOpen(false);
-    }
   };
 
   const formatDate = (dateString: string) => {
@@ -129,6 +100,16 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
 
   return (
     <>
+      {deleteDialogOpen && (
+        <DeleteCustomerForm
+          customer={customer}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onSuccess={() => {
+            setDeleteDialogOpen(false);
+          }}
+        />
+      )}
       <div className="p-6 space-y-6">
         {/* Customer Avatar and Basic Info */}
         <div className="space-y-4">
@@ -328,46 +309,6 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
           onSuccess={handleEditComplete}
         />
       )}
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Delete Customer</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete {customer.first_name}{" "}
-              {customer.last_name}? This action cannot be undone and will
-              permanently remove all customer data.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Customer
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

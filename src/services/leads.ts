@@ -111,7 +111,7 @@ export async function convertLeadToCustomer(
   leadId: number,
   customerData?: Record<string, unknown>
 ): Promise<JsonResponse<null>> {
-  const res = await axios.post(`/api/lead/${leadId}`, customerData);
+  const res = await axios.patch(`/api/lead/${leadId}/convert`, customerData);
   if (res.status !== 200) {
     return jsonResponse({
       data: null,

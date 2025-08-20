@@ -79,7 +79,7 @@ export function AddLeadForm({
       }
 
       if (formData.source === "") {
-        toast.error("Last name is required");
+        toast.error("Source is required");
         setIsSubmitting(false);
         return;
       }
@@ -87,7 +87,6 @@ export function AddLeadForm({
       // Create lead
       const success = await handleCreateLead({
         ...formData,
-        location_id: "", // This will be set by the hook
       });
 
       if (success) {

@@ -102,7 +102,6 @@ export const useLeads = () => {
 
         if (response.status === "success") {
           toast.success("Lead created successfully");
-          await refreshLeads();
           return true;
         } else {
           toast.error(response.message || "Failed to create lead");
@@ -115,7 +114,7 @@ export const useLeads = () => {
         return false;
       }
     },
-    [refreshLeads]
+    []
   );
 
   const handleUpdateLead = useCallback(
@@ -125,7 +124,6 @@ export const useLeads = () => {
 
         if (response.status === "success") {
           toast.success("Lead updated successfully");
-          await refreshLeads();
           return true;
         } else {
           toast.error(response.message || "Failed to update lead");
@@ -138,7 +136,7 @@ export const useLeads = () => {
         return false;
       }
     },
-    [refreshLeads]
+    []
   );
 
   const handleDeleteLead = useCallback(

@@ -98,9 +98,14 @@ export function EditLeadForm({
         setIsSubmitting(false);
         return;
       }
+      if (!formData.source) {
+        toast.error("Source is required");
+        setIsSubmitting(false);
+        return;
+      }
 
       // Update lead
-      const success = await handleUpdateLead(lead.id.toString(), formData);
+      const success = await handleUpdateLead(lead.id, formData);
 
       if (success) {
         onSuccess();

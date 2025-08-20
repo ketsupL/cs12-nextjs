@@ -67,7 +67,6 @@ export interface CreateLeadData {
   status?: LeadStatus;
   source?: LeadSource | "";
   notes?: string;
-  location_id: string;
 }
 
 export interface UpdateLeadData {

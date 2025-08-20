@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/data-table-v2";
 import { Badge } from "@/components/ui/badge";
 import { useLeads } from "@/hooks/useLeads";
+import DeleteLeadForm from "./delete-lead-form";
 
 export function LeadsList() {
   const {
@@ -35,6 +36,7 @@ export function LeadsList() {
 
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [isEditLeadOpen, setIsEditLeadOpen] = useState<Lead | false>(false);
+  const [isDeleteLeadOpen, setIsDeleteLeadOpen] = useState<Lead | false>(false);
 
   // Get status badge component
   const getStatusBadge = (status: string) => {
@@ -56,12 +58,9 @@ export function LeadsList() {
       sortable: true,
       render: (value: unknown, lead: Lead) => (
         <div>
-          <Link
-            href={`/dashboard/leads/${lead.id}`}
-            className="hover:underline font-medium"
-          >
+          <p className="font-medium">
             {lead.first_name + " " + lead.last_name}
-          </Link>
+          </p>
           {lead.company && (
             <div className="text-sm text-muted-foreground flex items-center gap-1">
               <Building className="h-3 w-3" />
@@ -118,7 +117,6 @@ export function LeadsList() {
     },
   ];
 
-  // Action configuration for DataTableV2
   const actions: DataTableAction<Lead>[] = [
     {
       icon: Edit,
@@ -139,11 +137,7 @@ export function LeadsList() {
     {
       icon: Trash2,
       label: "Delete Lead",
-      onClick: async (lead: Lead) => {
-        if (confirm("Are you sure you want to delete this lead?")) {
-          await handleDeleteLead(lead.id);
-        }
-      },
+      onClick: async (lead: Lead) => setIsDeleteLeadOpen(lead),
     },
   ];
 
@@ -156,6 +150,7 @@ export function LeadsList() {
         console.log("Batch delete clicked for:", selectedIds);
       },
       show: (count: number) => count > 0,
+      variant: "destructive",
     },
   ];
 
@@ -190,6 +185,17 @@ export function LeadsList() {
           onOpenChange={() => setIsEditLeadOpen(false)}
           onSuccess={() => {
             setIsEditLeadOpen(false);
+            refreshLeads();
+          }}
+        />
+      )}
+      {isDeleteLeadOpen && (
+        <DeleteLeadForm
+          lead={isDeleteLeadOpen}
+          open={!!isDeleteLeadOpen}
+          onOpenChange={() => setIsDeleteLeadOpen(false)}
+          onSuccess={() => {
+            setIsDeleteLeadOpen(false);
             refreshLeads();
           }}
         />
@@ -230,7 +236,9 @@ export function LeadsList() {
         showAddButton={true}
         addButtonLabel="Add Lead"
         onAddClick={() => setIsAddLeadOpen(true)}
-        sortKey={sortConfig.length > 0 ? sortConfig[0].key as string : undefined}
+        sortKey={
+          sortConfig.length > 0 ? (sortConfig[0].key as string) : undefined
+        }
         sortDirection={sortConfig.length > 0 ? sortConfig[0].sortBy : undefined}
         pagination={true}
         pageSize={perPage}
