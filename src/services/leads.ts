@@ -2,6 +2,7 @@ import { SortableLeadColumn } from "@/hooks/useLeads";
 import axios from "@/lib/axios";
 import {
   CreateLeadData,
+  Lead,
   PaginatedLeadResponse,
   UpdateLeadData,
 } from "@/types/leads";
@@ -109,9 +110,9 @@ export async function deleteLeads(
 
 export async function convertLeadToCustomer(
   leadId: number,
-  customerData?: Record<string, unknown>
+  leadData?: Lead
 ): Promise<JsonResponse<null>> {
-  const res = await axios.patch(`/api/lead/${leadId}/convert`, customerData);
+  const res = await axios.patch(`/api/leads/${leadId}/convert`, leadData);
   if (res.status !== 200) {
     return jsonResponse({
       data: null,

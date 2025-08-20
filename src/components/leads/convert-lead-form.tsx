@@ -7,42 +7,38 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { deleteCustomers } from "@/services/customers";
-import { Customer } from "@/types/database";
+import { useLeads } from "@/hooks/useLeads";
+import { Lead } from "@/types/leads";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface DeleteCustomerFormProps {
-  customer: Customer;
+interface ConvertLeadFormProps {
+  lead: Lead;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
-export default function DeleteCustomerForm({
-  customer,
+export default function ConvertLeadForm({
+  lead,
   open,
   onOpenChange,
   onSuccess,
-}: DeleteCustomerFormProps) {
-  const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
+}: ConvertLeadFormProps) {
+  const [isDeleting, setIsConverting] = useState(false);
+  const { handleConvertLead } = useLeads();
+  const handleConvert = async () => {
+    setIsConverting(true);
     try {
-      const response = await deleteCustomers(new Set([String(customer.id)]));
-      if (response.status === "success") {
-        toast.success("Customer deleted successfully");
-        router.push("/dashboard/customers");
+      const success = await handleConvertLead(lead.id, lead);
+      if (success) {
         onSuccess();
-      } else {
-        toast.error(response.message || "Failed to delete customer");
       }
-      setIsDeleting(false);
     } catch (error) {
-      console.error("Failed to delete customer:", error);
+      console.error("Failed to convert lead:", error);
       toast.error("An unexpected error occurred");
+    } finally {
+      setIsConverting(false);
     }
   };
 
@@ -50,11 +46,10 @@ export default function DeleteCustomerForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete Customer</DialogTitle>
+          <DialogTitle>Convert Lead</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete {customer.first_name}{" "}
-            {customer.last_name}? This action cannot be undone and will
-            permanently remove all customer data.
+            Are you sure you want to convert {lead.first_name} {lead.last_name}?
+            This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -66,19 +61,17 @@ export default function DeleteCustomerForm({
             Cancel
           </Button>
           <Button
-            variant="destructive"
-            onClick={handleDelete}
+            variant="default"
+            onClick={handleConvert}
             disabled={isDeleting}
           >
             {isDeleting ? (
               <>
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                Deleting...
+                Converting...
               </>
             ) : (
-              <>
-                Delete Customer
-              </>
+              <>Convert Lead</>
             )}
           </Button>
         </DialogFooter>

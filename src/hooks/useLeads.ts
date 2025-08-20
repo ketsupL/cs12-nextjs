@@ -146,7 +146,6 @@ export const useLeads = () => {
 
         if (response.status === "success") {
           toast.success("Lead deleted successfully");
-          await refreshLeads();
           return true;
         } else {
           toast.error(response.message || "Failed to delete lead");
@@ -159,7 +158,7 @@ export const useLeads = () => {
         return false;
       }
     },
-    [refreshLeads]
+    []
   );
 
   const handleDeleteSelectedLeads = useCallback(async (): Promise<boolean> => {
@@ -191,14 +190,13 @@ export const useLeads = () => {
   const handleConvertLead = useCallback(
     async (
       id: number,
-      customerData?: Record<string, unknown>
+      leadData?: Lead
     ): Promise<boolean> => {
       try {
-        const response = await convertLeadToCustomer(id, customerData);
+        const response = await convertLeadToCustomer(id, leadData);
 
         if (response.status === "success") {
           toast.success("Lead converted to customer successfully");
-          await refreshLeads();
           return true;
         } else {
           toast.error(response.message || "Failed to convert lead");

@@ -193,11 +193,14 @@ export function AddLeadForm({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {LEAD_STATUSES.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
+                    {LEAD_STATUSES.map(
+                      (status) =>
+                        status.value !== "converted" && (
+                          <SelectItem key={status.value} value={status.value}>
+                            {status.label}
+                          </SelectItem>
+                        )
+                    )}
                   </SelectContent>
                 </Select>
               </div>

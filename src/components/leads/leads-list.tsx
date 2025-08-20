@@ -5,7 +5,6 @@ import { Phone, Mail, Edit, Trash2, UserCheck, Building } from "lucide-react";
 import { Lead } from "@/types/leads";
 import { LEAD_STATUSES } from "@/types/leads";
 import { AddLeadForm, EditLeadForm } from "./index";
-import Link from "next/link";
 import {
   DataTableV2,
   type DataTableColumn,
@@ -15,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useLeads } from "@/hooks/useLeads";
 import DeleteLeadForm from "./delete-lead-form";
+import ConvertLeadForm from "./convert-lead-form";
 
 export function LeadsList() {
   const {
@@ -26,9 +26,7 @@ export function LeadsList() {
     setSearchTerm,
     loading,
     refreshLeads,
-    handleDeleteLead,
     setPerPage,
-    handleConvertLead,
     setSortConfig,
     perPage,
     totalCount,
@@ -37,6 +35,7 @@ export function LeadsList() {
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [isEditLeadOpen, setIsEditLeadOpen] = useState<Lead | false>(false);
   const [isDeleteLeadOpen, setIsDeleteLeadOpen] = useState<Lead | false>(false);
+  const [isConvertLeadOpen, setIsConvertLeadOpen] = useState<Lead | false>(false);
 
   // Get status badge component
   const getStatusBadge = (status: string) => {
@@ -126,13 +125,7 @@ export function LeadsList() {
     {
       icon: UserCheck,
       label: "Convert to Customer",
-      onClick: async (lead: Lead) => {
-        if (
-          confirm("Are you sure you want to convert this lead to a customer?")
-        ) {
-          await handleConvertLead(lead.id);
-        }
-      },
+      onClick: async (lead: Lead) => setIsConvertLeadOpen(lead)
     },
     {
       icon: Trash2,
@@ -201,6 +194,17 @@ export function LeadsList() {
         />
       )}
 
+      {isConvertLeadOpen && (
+        <ConvertLeadForm
+          lead={isConvertLeadOpen}
+          open={!!isConvertLeadOpen}
+          onOpenChange={() => setIsConvertLeadOpen(false)}
+          onSuccess={() => {
+            setIsConvertLeadOpen(false);
+            refreshLeads();
+          }}
+        />
+      )}
       {/* Data Table */}
       <DataTableV2<Lead>
         data={leads}

@@ -198,7 +198,7 @@ export function EditLeadForm({
                   </SelectTrigger>
                   <SelectContent>
                     {LEAD_STATUSES.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
+                      <SelectItem key={status.value} hidden={status.value === 'converted'} value={status.value}>
                         {status.label}
                       </SelectItem>
                     ))}
