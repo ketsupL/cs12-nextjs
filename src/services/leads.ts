@@ -111,10 +111,12 @@ export async function deleteLeads(
 export async function convertLeadToCustomer(
   leadId: number,
   address: string,
+  email: string,
   leadData?: Lead
 ): Promise<JsonResponse<null>> {
   const res = await axios.patch(`/api/leads/${leadId}/convert`, {
     ...leadData,
+    email,
     property_address: address,
   });
   if (res.status !== 200) {

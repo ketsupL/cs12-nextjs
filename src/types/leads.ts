@@ -1,11 +1,11 @@
 export interface Lead extends Record<string, unknown> {
   id: number;
   first_name: string;
-  last_name:string;
+  last_name: string;
   email?: string;
   phone?: string;
   company?: string;
-  status: "new" | "contacted" | "qualified" | "converted" | "lost";
+  status: LeadStatus;
   source?: LeadSource;
   notes?: string;
   created_at: string;
@@ -45,7 +45,12 @@ export const LEAD_STATUSES = [
   { value: "lost", label: "Lost", color: "bg-red-100 text-red-800" },
 ] as const;
 
-export type LeadStatus= "new" | "contacted" | "qualified" | "converted" | "lost";
+export type LeadStatus =
+  | "new"
+  | "contacted"
+  | "qualified"
+  | "converted"
+  | "lost";
 
 export enum LeadSource {
   Website = "Website",
@@ -60,7 +65,7 @@ export enum LeadSource {
 }
 export interface CreateLeadData {
   first_name: string;
-  last_name:string;
+  last_name: string;
   email?: string;
   phone?: string;
   company?: string;
@@ -75,7 +80,7 @@ export interface UpdateLeadData {
   email?: string;
   phone?: string;
   company?: string;
-  status?: LeadStatus,
+  status?: LeadStatus;
   source?: LeadSource | "";
   notes?: string;
   assigned_to?: string;

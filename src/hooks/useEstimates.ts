@@ -50,8 +50,8 @@ export interface SortableLeadColumn {
 //   setPerPage: (pageNumber: number) => void;
 // }
 
-export const useLeads = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
+export const useEstimates = () => {
+  const [estimate, setEstimate] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,7 +75,7 @@ export const useLeads = () => {
       );
 
       if (response.status === "success" && response.data) {
-        setLeads(response.data.data);
+        setEstimate(response.data.data);
         setTotalCount(response?.data?.total || 0);
       } else {
         setError(response.message || "Failed to fetch leads");
@@ -141,27 +141,24 @@ export const useLeads = () => {
     []
   );
 
-  const handleDeleteLead = useCallback(
-    async (id: number): Promise<boolean> => {
-      try {
-        const response = await deleteLead(id);
+  const handleDeleteLead = useCallback(async (id: number): Promise<boolean> => {
+    try {
+      const response = await deleteLead(id);
 
-        if (response.status === "success") {
-          toast.success("Lead deleted successfully");
-          return true;
-        } else {
-          toast.error(response.message || "Failed to delete lead");
-          return false;
-        }
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
-        toast.error(errorMessage);
+      if (response.status === "success") {
+        toast.success("Lead deleted successfully");
+        return true;
+      } else {
+        toast.error(response.message || "Failed to delete lead");
         return false;
       }
-    },
-    []
-  );
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred";
+      toast.error(errorMessage);
+      return false;
+    }
+  }, []);
 
   const handleDeleteSelectedLeads = useCallback(async (): Promise<boolean> => {
     if (selectedRows.size === 0) {
@@ -189,32 +186,7 @@ export const useLeads = () => {
     }
   }, [selectedRows, refreshLeads]);
 
-  const handleConvertLead = useCallback(
-    async (
-      id: number,
-      address:string,
-      email:string,
-      leadData?: Lead,
-    ): Promise<boolean> => {
-      try {
-        const response = await convertLeadToCustomer(id, address,email,leadData);
 
-        if (response.status === "success") {
-          toast.success("Lead converted to customer successfully");
-          return true;
-        } else {
-          toast.error(response.message || "Failed to convert lead");
-          return false;
-        }
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
-        toast.error(errorMessage);
-        return false;
-      }
-    },
-    []
-  );
 
   // Fetch leads when dependencies change
   useEffect(() => {
@@ -229,7 +201,7 @@ export const useLeads = () => {
   }, [debouncedSearchTerm]);
 
   return {
-    leads,
+    estimate,
     loading,
     error,
     totalCount,
@@ -240,7 +212,7 @@ export const useLeads = () => {
     selectedRows,
     perPage,
     // Actions
-    setLeads,
+    setEstimate,
     setCurrentPage,
     setSearchTerm,
     setSortConfig,
@@ -251,6 +223,5 @@ export const useLeads = () => {
     handleUpdateLead,
     handleDeleteLead,
     handleDeleteSelectedLeads,
-    handleConvertLead,
   };
 };

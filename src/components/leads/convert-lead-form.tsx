@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { useLeads } from "@/hooks/useLeads";
 import { Lead } from "@/types/leads";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
-import { AlertTriangle } from "lucide-react";
+import { Input } from "../ui/input";
 
 interface ConvertLeadFormProps {
   lead: Lead;
@@ -31,8 +30,9 @@ export default function ConvertLeadForm({
   const [isConverting, setIsConverting] = useState(false);
   const { handleConvertLead } = useLeads();
   const [address, setAddress] = useState("");
-  const handleConvert = async (e:FormEvent) => {
-    e.preventDefault()
+  const [email, setEmail] = useState(lead.email || "");
+  const handleConvert = async (e: FormEvent) => {
+    e.preventDefault();
     setIsConverting(true);
     try {
       if (address.trim() === "") {
@@ -40,7 +40,7 @@ export default function ConvertLeadForm({
         setIsConverting(false);
         return;
       }
-      const success = await handleConvertLead(lead.id, address, lead);
+      const success = await handleConvertLead(lead.id, address, email, lead);
       if (success) {
         onSuccess();
       }
@@ -63,6 +63,19 @@ export default function ConvertLeadForm({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleConvert}>
+          <div className="space-y-2 my-6">
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              disabled={lead.email !== ""}
+              value={email || ""}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email address"
+              required
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="address">Property Address *</Label>
             <Textarea
