@@ -190,10 +190,11 @@ export const useLeads = () => {
   const handleConvertLead = useCallback(
     async (
       id: number,
-      leadData?: Lead
+      address:string,
+      leadData?: Lead,
     ): Promise<boolean> => {
       try {
-        const response = await convertLeadToCustomer(id, leadData);
+        const response = await convertLeadToCustomer(id, address,leadData);
 
         if (response.status === "success") {
           toast.success("Lead converted to customer successfully");
@@ -209,7 +210,7 @@ export const useLeads = () => {
         return false;
       }
     },
-    [refreshLeads]
+    []
   );
 
   // Fetch leads when dependencies change

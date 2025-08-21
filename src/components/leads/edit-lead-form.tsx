@@ -206,7 +206,7 @@ export function EditLeadForm({
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="source">Source</Label>
+                <Label htmlFor="source">Source *</Label>
                 <Select
                   value={formData.source || ""}
                   onValueChange={(value) => handleSelectChange("source", value)}

@@ -10,8 +10,11 @@ import {
 import { useLeads } from "@/hooks/useLeads";
 import { Lead } from "@/types/leads";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { AlertTriangle } from "lucide-react";
 
 interface ConvertLeadFormProps {
   lead: Lead;
@@ -25,12 +28,19 @@ export default function ConvertLeadForm({
   onOpenChange,
   onSuccess,
 }: ConvertLeadFormProps) {
-  const [isDeleting, setIsConverting] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const { handleConvertLead } = useLeads();
-  const handleConvert = async () => {
+  const [address, setAddress] = useState("");
+  const handleConvert = async (e:FormEvent) => {
+    e.preventDefault()
     setIsConverting(true);
     try {
-      const success = await handleConvertLead(lead.id, lead);
+      if (address.trim() === "") {
+        toast.error("Address is required");
+        setIsConverting(false);
+        return;
+      }
+      const success = await handleConvertLead(lead.id, address, lead);
       if (success) {
         onSuccess();
       }
@@ -47,34 +57,44 @@ export default function ConvertLeadForm({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Convert Lead</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to convert {lead.first_name} {lead.last_name}?
-            This action cannot be undone.
+          <DialogDescription className="text-muted-foreground">
+            Convert customer {lead.first_name + " " + lead.last_name}? This
+            action cannot be undone.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            onClick={handleConvert}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <>
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                Converting...
-              </>
-            ) : (
-              <>Convert Lead</>
-            )}
-          </Button>
-        </DialogFooter>
+        <form onSubmit={handleConvert}>
+          <div className="space-y-2">
+            <Label htmlFor="address">Property Address *</Label>
+            <Textarea
+              id="address"
+              name="address"
+              value={address || ""}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter Property Address"
+              className="resize-none"
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isConverting}
+            >
+              Cancel
+            </Button>
+            <Button variant="default" type="submit" disabled={isConverting}>
+              {isConverting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                  Converting...
+                </>
+              ) : (
+                <>Convert Lead</>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

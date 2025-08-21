@@ -70,7 +70,7 @@ function DialogContent({
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           "data-[state=open]:duration-300 data-[state=closed]:duration-200",
-          "ring-1 ring-gray-100 ring-opacity-70",
+          // "ring-1 ring-gray-100 ring-opacity-70",
           className
         )}
         {...props}
