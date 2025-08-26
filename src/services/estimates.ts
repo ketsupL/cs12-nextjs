@@ -79,3 +79,17 @@ export async function editEstimate(
     status: "success",
   });
 }
+export async function deleteEstimate(id: number): Promise<JsonResponse<null>> {
+  const res = await axios.delete(`/api/estimates/${id}`,);
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to delete estimate",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Edit, Trash2,} from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { Lead } from "@/types/leads";
 import {
   DataTableV2,
@@ -18,6 +18,7 @@ import { currencyCharacter, Customer } from "@/types/database";
 import { AddEstimateForm } from "./add-estimate-form";
 import { wait } from "@/utils/promise";
 import { EditEstimateForm } from "./edit-estimate-form";
+import DeleteEstimateForm from "./delete-estimate-form";
 
 export function EstimatesList() {
   const {
@@ -147,7 +148,7 @@ export function EstimatesList() {
       variant: "destructive",
     },
   ];
- 
+
   return (
     <div className="space-y-4">
       <div>
@@ -196,29 +197,18 @@ export function EstimatesList() {
           }}
         />
       )}
-      {/* {isDeleteEstimateOpen && (
-        <DeleteLeadForm
-          lead={isDeleteEstimateOpen}
+      {isDeleteEstimateOpen && (
+        <DeleteEstimateForm
+          estimate={isDeleteEstimateOpen}
           open={!!isDeleteEstimateOpen}
           onOpenChange={() => setIsDeleteEstimateOpen(false)}
           onSuccess={() => {
             setIsDeleteEstimateOpen(false);
-            refreshLeads();
+            refreshEstimates();
           }}
         />
       )}
 
-      {isConvertLeadOpen && (
-        <ConvertLeadForm
-          lead={isConvertLeadOpen}
-          open={!!isConvertLeadOpen}
-          onOpenChange={() => setIsConvertLeadOpen(false)}
-          onSuccess={() => {
-            setIsConvertLeadOpen(false);
-            refreshLeads();
-          }}
-        />
-      )} */}
       {/* Data Table */}
       <DataTableV2<Estimate>
         data={estimate}

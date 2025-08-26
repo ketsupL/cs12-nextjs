@@ -97,96 +97,9 @@ export const useEstimates = () => {
     await fetchEstimates();
   }, [fetchEstimates]);
 
-  const handleCreateLead = useCallback(
-    async (leadData: CreateLeadData): Promise<boolean> => {
-      try {
-        const response = await createLead({
-          ...leadData,
-        });
+  
 
-        if (response.status === "success") {
-          toast.success("Lead created successfully");
-          return true;
-        } else {
-          toast.error(response.message || "Failed to create lead");
-          return false;
-        }
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
-        toast.error(errorMessage);
-        return false;
-      }
-    },
-    []
-  );
-
-  const handleUpdateLead = useCallback(
-    async (id: number, leadData: UpdateLeadData): Promise<boolean> => {
-      try {
-        const response = await updateLead(id, leadData);
-
-        if (response.status === "success") {
-          toast.success("Lead updated successfully");
-          return true;
-        } else {
-          toast.error(response.message || "Failed to update lead");
-          return false;
-        }
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
-        toast.error(errorMessage);
-        return false;
-      }
-    },
-    []
-  );
-
-  const handleDeleteLead = useCallback(async (id: number): Promise<boolean> => {
-    try {
-      const response = await deleteLead(id);
-
-      if (response.status === "success") {
-        toast.success("Lead deleted successfully");
-        return true;
-      } else {
-        toast.error(response.message || "Failed to delete lead");
-        return false;
-      }
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      toast.error(errorMessage);
-      return false;
-    }
-  }, []);
-
-  const handleDeleteSelectedLeads = useCallback(async (): Promise<boolean> => {
-    if (selectedRows.size === 0) {
-      toast.error("No leads selected");
-      return false;
-    }
-
-    try {
-      const response = await deleteLeads(selectedRows);
-
-      if (response.status === "success") {
-        toast.success(`${selectedRows.size} lead(s) deleted successfully`);
-        setSelectedRows(new Set());
-        await refreshEstimates();
-        return true;
-      } else {
-        toast.error(response.message || "Failed to delete leads");
-        return false;
-      }
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      toast.error(errorMessage);
-      return false;
-    }
-  }, [selectedRows, refreshEstimates]);
+ 
 
   // Fetch leads when dependencies change
   useEffect(() => {
@@ -219,9 +132,5 @@ export const useEstimates = () => {
     setSelectedRows,
     refreshEstimates,
     setPerPage,
-    handleCreateLead,
-    handleUpdateLead,
-    handleDeleteLead,
-    handleDeleteSelectedLeads,
   };
 };
