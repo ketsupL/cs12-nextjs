@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Phone, Mail, Edit, Trash2, UserCheck, Building } from "lucide-react";
+import { Edit, Trash2,} from "lucide-react";
 import { Lead } from "@/types/leads";
-import { LEAD_STATUSES } from "@/types/leads";
 import {
   DataTableV2,
   type DataTableColumn,
@@ -11,15 +10,14 @@ import {
   type DataTableBatchAction,
 } from "@/components/ui/data-table-v2";
 import { Badge } from "@/components/ui/badge";
-import { useLeads } from "@/hooks/useLeads";
 import { useEstimates } from "@/hooks/useEstimates";
 import { Estimate, ESTIMATE_STATUSES } from "@/types/estimates";
 import Link from "next/link";
-import AddEstimateCustomerIdForm from "./search-customer-form";
 import SearchCustomerForm from "./search-customer-form";
 import { currencyCharacter, Customer } from "@/types/database";
 import { AddEstimateForm } from "./add-estimate-form";
 import { wait } from "@/utils/promise";
+import { EditEstimateForm } from "./edit-estimate-form";
 
 export function EstimatesList() {
   const {
@@ -149,7 +147,7 @@ export function EstimatesList() {
       variant: "destructive",
     },
   ];
-
+ 
   return (
     <div className="space-y-4">
       <div>
@@ -187,17 +185,17 @@ export function EstimatesList() {
         />
       )}
       {/* Edit Lead Form */}
-      {/* {isEditEstimateOpen && (
-        <EditLeadForm
-          lead={isEditEstimateOpen}
+      {isEditEstimateOpen && (
+        <EditEstimateForm
+          estimate={isEditEstimateOpen}
           open={!!isEditEstimateOpen}
           onOpenChange={() => setIsEditEstimateOpen(false)}
           onSuccess={() => {
             setIsEditEstimateOpen(false);
-            refreshLeads();
+            refreshEstimates();
           }}
         />
-      )} */}
+      )}
       {/* {isDeleteEstimateOpen && (
         <DeleteLeadForm
           lead={isDeleteEstimateOpen}

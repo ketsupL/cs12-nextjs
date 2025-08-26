@@ -22,24 +22,25 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
-import { currencyCharacter, Customer } from "@/types/database";
+import { currencyCharacter } from "@/types/database";
 import { Plus, Trash2 } from "lucide-react";
 import {
+  Estimate,
   ESTIMATE_STATUSES,
   EstimateAdd,
 } from "@/types/estimates";
 import NumberInput from "../ui/number-input";
-import { createEstimate } from "@/services/estimates";
+import { editEstimate } from "@/services/estimates";
 
 interface AddCustomerFormProps {
-  customer: Customer;
+  estimate: Estimate;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export function AddEstimateForm({
-  customer,
+export function EditEstimateForm({
+  estimate,
   open,
   onOpenChange,
   onSuccess,
@@ -48,10 +49,10 @@ export function AddEstimateForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<EstimateAdd>({
-    job_name: "",
-    status: "draft",
-    tasks: [{ description: "", price: "" }],
-    notes: "",
+    job_name: estimate.job_name,
+    status: estimate.status,
+    tasks: estimate.tasks,
+    notes: estimate.notes,
   });
   const [autoFocusTaskIndex, setAutoFocusTaskIndex] = useState<number | null>(
     null
@@ -62,6 +63,7 @@ export function AddEstimateForm({
       0
     );
   }, [formData.tasks]);
+  const [deletedIdSet, setDeletedIdSet] = useState<Set<number>>(new Set());
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -72,7 +74,6 @@ export function AddEstimateForm({
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -84,21 +85,25 @@ export function AddEstimateForm({
         setIsSubmitting(false);
         return;
       }
-
-      // Create Estimate with proper error handling
-      const response = await createEstimate(formData, Number(customer.id));
+      // Update Estimate with proper error handling
+      const response = await editEstimate(
+        formData,
+        Number(estimate.customer.id),
+        estimate.id,
+        [...deletedIdSet]
+      );
 
       if (response.status === "error") {
-        throw new Error(response.message || "Failed to create estimate");
+        throw new Error(response.message || "Failed to update estimate");
       }
 
-      // Success! The estimate was created
-      toast.success("Estimate created successfully");
+      // Success! The estimate was updated
+      toast.success("Estimate updated successfully");
 
       // Reset form data
       setFormData({
         job_name: "",
-        status: "draft" ,
+        status: "draft",
         tasks: [{ description: "", price: "" }],
         notes: "",
       });
@@ -110,11 +115,11 @@ export function AddEstimateForm({
       onOpenChange(false);
       router.refresh(); // Refresh the page to show the new estimate
     } catch (error) {
-      console.error("Error creating estimate:", error);
+      console.error("Error updating estimate:", error);
       toast.error(
         typeof error === "object" && error !== null && "message" in error
           ? String(error.message)
-          : "Failed to create estimate. Please try again."
+          : "Failed to update estimate. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -156,7 +161,7 @@ export function AddEstimateForm({
       "
       >
         <DialogHeader>
-          <DialogTitle>Add New Estimate</DialogTitle>
+          <DialogTitle>Edit Estimate</DialogTitle>
           <DialogDescription>
             Enter the estimate details below. Fields marked with * are required.
           </DialogDescription>
@@ -169,7 +174,11 @@ export function AddEstimateForm({
                 <Input
                   id="customer_name"
                   name="customer_name"
-                  value={customer.first_name + " " + customer.last_name}
+                  value={
+                    estimate.customer.first_name +
+                    " " +
+                    estimate.customer.last_name
+                  }
                   disabled
                   required
                 />
@@ -179,7 +188,7 @@ export function AddEstimateForm({
                 <Input
                   id="email"
                   name="email"
-                  value={customer.email as string}
+                  value={estimate.customer.email as string}
                   disabled
                   required
                 />
@@ -253,6 +262,8 @@ export function AddEstimateForm({
                                 tasks: newFormDataDescription,
                               };
                             });
+                            if (formData.tasks.at(index)?.id === undefined)
+                              return;
                           }}
                           required
                           placeholder="Enter task description"
@@ -283,6 +294,8 @@ export function AddEstimateForm({
                               );
                               return { ...formData, tasks: newFormDataPrice };
                             });
+                            if (formData.tasks.at(index)?.id === undefined)
+                              return;
                           }}
                           required
                           placeholder="0.00"
@@ -296,7 +309,17 @@ export function AddEstimateForm({
                       <div className="ml-10 mr-4 w-5"></div>
                     ) : (
                       <button
-                        onClick={() => removeTask(index)}
+                        onClick={() => {
+                          removeTask(index);
+                          if (formData.tasks.at(index)?.id === undefined)
+                            return;
+
+                          const newDeletedIdSet = new Set(deletedIdSet);
+                          newDeletedIdSet.add(
+                            Number(formData.tasks.at(index)?.id)
+                          );
+                          setDeletedIdSet(newDeletedIdSet);
+                        }}
                         type="button"
                         className="cursor-pointer"
                       >
@@ -318,10 +341,11 @@ export function AddEstimateForm({
               >
                 Total Estimate:&nbsp;
                 <span className="font-medium">
-                  {currencyCharacter + totalTaskPrice.toLocaleString(undefined,{
-                    minimumFractionDigits:2,
-                    maximumFractionDigits:2
-                  })}
+                  {currencyCharacter +
+                    totalTaskPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                 </span>
               </div>
             </div>
@@ -372,7 +396,7 @@ export function AddEstimateForm({
               disabled={isSubmitting}
               className="bg-primary"
             >
-              {isSubmitting ? "Creating..." : "Create Estimate"}
+              {isSubmitting ? "Editing..." : "Edit Estimate"}
             </Button>
           </DialogFooter>
         </form>

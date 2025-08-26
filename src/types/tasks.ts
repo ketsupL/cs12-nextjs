@@ -1,9 +1,9 @@
 export type Task = {
-  id: number;
+  id?: number;
   taskable_id: string;
   taskable_type: string;
   description: string;
   price: number | string;
 };
 
-export type TaskFillable = Pick<Task, "description" | "price">;
+export type TaskFillable = Pick<Task, "id" | "description" | "price">;

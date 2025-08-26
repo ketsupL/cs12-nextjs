@@ -43,3 +43,4 @@ export const ESTIMATE_STATUSES = [
 ] as const;
 
 export type EstimateAdd = Omit<Estimate, "id" | "customer">;
+export type EstimateEdit = Omit<Estimate, "customer">;

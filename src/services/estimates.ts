@@ -1,6 +1,10 @@
 import { SortableEstimateColumn } from "@/hooks/useEstimates";
 import axios from "@/lib/axios";
-import { EstimateAdd, PaginatedEstimateResponse } from "@/types/estimates";
+import {
+  EstimateAdd,
+  EstimateEdit,
+  PaginatedEstimateResponse,
+} from "@/types/estimates";
 import { JsonResponse, jsonResponse } from "@/utils/response";
 
 export async function getEstimatesByPagination(
@@ -40,6 +44,29 @@ export async function createEstimate(
   customerId: number
 ) {
   const res = await axios.post(`/api/estimates/${customerId}`, formData);
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to create customer",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}
+
+export async function editEstimate(
+  formData: EstimateAdd,
+  customerId: number,
+  estimateId: number,
+  deletedIds: number[] | []
+) {
+  const res = await axios.patch(`/api/estimates/${customerId}/${estimateId}`, {
+    ...formData,
+    deletedIds,
+  });
   if (res.status !== 200) {
     return jsonResponse({
       data: null,

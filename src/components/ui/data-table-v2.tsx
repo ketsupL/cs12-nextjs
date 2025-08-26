@@ -577,6 +577,7 @@ export function DataTableV2<T extends Record<string, unknown>>({
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={(e) => {
+
                                       e.stopPropagation();
                                       action.onClick(row);
                                     }}
