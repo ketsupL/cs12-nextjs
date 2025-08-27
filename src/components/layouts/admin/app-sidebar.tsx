@@ -72,14 +72,14 @@ const navigationData: NavigationData = {
       icon: Magnet,
     },
     {
-      title: "Jobs",
-      url: "/dashboard/jobs",
-      icon: Briefcase,
-    },
-    {
       title: "Estimate",
       url: "/dashboard/estimates",
       icon: TrendingUpDown,
+    },
+    {
+      title: "Jobs",
+      url: "/dashboard/jobs",
+      icon: Briefcase,
     },
     {
       title: "Invoices",

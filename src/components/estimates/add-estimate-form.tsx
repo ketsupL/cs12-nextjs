@@ -182,7 +182,7 @@ export function AddEstimateForm({
                 />
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 w-1/2">
               <Label htmlFor="company_name">Job Name *</Label>
               <Input
                 id="job_name"

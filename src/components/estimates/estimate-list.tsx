@@ -85,6 +85,10 @@ export function EstimatesList() {
       render: (value: unknown, estimate: Estimate) => (
         <div>
           <Link
+            onClick={(e)=>{
+              e.stopPropagation()
+              
+            }}
             href={`customers/${estimate.customer?.id}`}
             className="font-medium hover:underline"
           >

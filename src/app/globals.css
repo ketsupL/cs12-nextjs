@@ -140,3 +140,7 @@
 .animation-spin {
   animation: custom-spin 1s linear infinite;
 }
+
+.gutter{
+scrollbar-gutter: stable;  
+}
