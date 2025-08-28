@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, FileCheck, Trash2 } from "lucide-react";
 import { Lead } from "@/types/leads";
 import {
   DataTableV2,
@@ -21,6 +21,7 @@ import { EditEstimateForm } from "./edit-estimate-form";
 import DeleteEstimateForm from "./delete-estimate-form";
 import DeleteEstimatesByBatchForm from "./batch-delete-estimate-form";
 import { InfoEstimate } from "./info-estimate";
+import ApproveEstimateForm from "./approve-estimate-form";
 
 export function EstimatesList() {
   const {
@@ -55,7 +56,9 @@ export function EstimatesList() {
   const [selectedEstimateIds, setSelectedEstimateIds] = useState<Set<string>>(
     new Set()
   );
-
+  const [isApproveEstimateOpen, setIsApproveEstimateOpen] = useState<
+    Estimate | false
+  >(false);
   // Get status badge component
   const getStatusBadge = (status: string) => {
     const statusConfig = ESTIMATE_STATUSES.find((s) => s.value === status);
@@ -140,6 +143,11 @@ export function EstimatesList() {
       icon: Edit,
       label: "Edit Estimate",
       onClick: (estimate: Estimate) => setIsEditEstimateOpen(estimate),
+    },
+    {
+      icon: FileCheck,
+      label: "Approve Estimate",
+      onClick: async (estimate: Estimate) => setIsApproveEstimateOpen(estimate),
     },
     {
       icon: Trash2,
@@ -233,6 +241,18 @@ export function EstimatesList() {
           onSuccess={() => {
             setIsDeleteEstimateOpen(false);
             setIsInfoEstimateShown(false);
+            refreshEstimates();
+          }}
+        />
+      )}
+
+      {isApproveEstimateOpen && (
+        <ApproveEstimateForm
+          estimate={isApproveEstimateOpen}
+          open={!!isApproveEstimateOpen}
+          onOpenChange={() => setIsApproveEstimateOpen(false)}
+          onSuccess={() => {
+            setIsApproveEstimateOpen(false);
             refreshEstimates();
           }}
         />
