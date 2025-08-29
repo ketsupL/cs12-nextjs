@@ -47,6 +47,7 @@ export function AddEstimateForm({
   const [formData, setFormData] = useState<EstimateAdd>({
     job_name: "",
     status: "draft",
+    site_address: "",
     tasks: [{ description: "", price: "" }],
     notes: "",
   });
@@ -95,6 +96,7 @@ export function AddEstimateForm({
       // Reset form data
       setFormData({
         job_name: "",
+        site_address: "",
         status: "draft",
         tasks: [{ description: "", price: "" }],
         notes: "",
@@ -182,14 +184,25 @@ export function AddEstimateForm({
                 />
               </div>
             </div>
-            <div className="space-y-2 w-1/2">
-              <Label htmlFor="company_name">Job Name *</Label>
-              <Input
-                id="job_name"
-                name="job_name"
-                value={formData.job_name || ""}
-                onChange={handleChange}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2 ">
+                <Label htmlFor="job_name">Job Name *</Label>
+                <Input
+                  id="job_name"
+                  name="job_name"
+                  value={formData.job_name || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2 ">
+                <Label htmlFor="site_address">Site Address </Label>
+                <Input
+                  id="site_address"
+                  name="site_address"
+                  value={formData.site_address || ""}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
             <div
               ref={taskContainerRef}

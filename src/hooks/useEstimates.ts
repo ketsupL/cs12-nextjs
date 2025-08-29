@@ -14,8 +14,11 @@ import {
   updateLead,
 } from "@/services/leads";
 import { useDebounce } from "./useDebounce";
-import { getEstimatesByPagination } from "@/services/estimates";
-import { Estimate } from "@/types/estimates";
+import {
+  approveEstimate,
+  getEstimatesByPagination,
+} from "@/services/estimates";
+import { Estimate, EstimateAdd } from "@/types/estimates";
 
 export interface SortableEstimateColumn {
   key: keyof Lead;
@@ -97,9 +100,35 @@ export const useEstimates = () => {
     await fetchEstimates();
   }, [fetchEstimates]);
 
-  
+  const handleApproveEstimate = useCallback(
+    async (
+      customerId: number,
+      estimateId: number,
+      due_date: string
+    ): Promise<boolean> => {
+      try {
+        const response = await approveEstimate(
+          customerId,
+          estimateId,
+          due_date
+        );
 
- 
+        if (response.status === "success") {
+          toast.success("Estimate approved successfully");
+          return true;
+        } else {
+          toast.error(response.message || "Failed to approved lead");
+          return false;
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An error occurred";
+        toast.error(errorMessage);
+        return false;
+      }
+    },
+    []
+  );
 
   // Fetch leads when dependencies change
   useEffect(() => {

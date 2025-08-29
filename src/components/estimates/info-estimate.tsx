@@ -143,7 +143,10 @@ export function InfoEstimate({
                   <MapPin size={16} className="text-muted-foreground mt-1" />
                   <div>
                     <p className="text-sm text-neutral-600">Site Address</p>
-                    <p className="">{estimate.site_address}</p>
+                    <p className="">
+                      {estimate.site_address ||
+                        estimate.customer.property_address}
+                    </p>
                   </div>
                 </div>
               </div>

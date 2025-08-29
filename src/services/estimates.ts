@@ -1,9 +1,6 @@
 import { SortableEstimateColumn } from "@/hooks/useEstimates";
 import axios from "@/lib/axios";
-import {
-  EstimateAdd,
-  PaginatedEstimateResponse,
-} from "@/types/estimates";
+import { EstimateAdd, PaginatedEstimateResponse } from "@/types/estimates";
 import { JsonResponse, jsonResponse } from "@/utils/response";
 
 export async function getEstimatesByPagination(
@@ -103,6 +100,30 @@ export async function deleteEstimates(
       data: null,
       status: "error",
       message: "Failed to update customer",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}
+
+export async function approveEstimate(
+  customerId: number,
+  estimateId: number,
+  due_date: string
+): Promise<JsonResponse<null>> {
+  const res = await axios.patch(
+    `/api/estimates/${customerId}/${estimateId}/approve`,
+    {
+      due_date,
+    }
+  );
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to delete lead",
     });
   }
   return jsonResponse({
