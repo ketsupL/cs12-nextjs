@@ -15,6 +15,8 @@ import { currencyCharacter, Customer } from "@/types/database";
 import { useInvoices } from "@/hooks/useInvoice";
 import { Invoice, INVOICE_STATUSES } from "@/types/invoices";
 import SearchCustomerForm from "../estimates/search-customer-form";
+import { formatToPHDate } from "@/utils/date";
+import { AddInvoiceForm } from "./add-invoice-form";
 export function InvoicesList() {
   const {
     invoice,
@@ -104,19 +106,29 @@ export function InvoicesList() {
         <div className="flex flex-col gap-1">{invoice.job_name}</div>
       ),
     },
+
+    {
+      key: "due_date",
+      label: "Due Date",
+      sortable: true,
+      render: (value: unknown) => (
+        <div className="flex flex-col gap-1">
+          {formatToPHDate(value as string)}
+        </div>
+      ),
+    },
     {
       key: "status",
       label: "Status",
       sortable: true,
       render: (value: unknown) => getStatusBadge(value as string),
     },
-
     {
       key: "paid_amount",
-      label: "Due Amount",
+      label: "Paid Amount",
       sortable: true,
       render: (value: unknown, row) => {
-        const num = Number(row.tasks_total_price) - Number(value) || 0;
+        const num = Number(value) || 0;
 
         return (
           <span className="text-sm">
@@ -191,7 +203,7 @@ export function InvoicesList() {
           <div>
             <h1 className="text-2xl font-bold">Invoices</h1>
             <p className="text-muted-foreground">
-              Manage your sales leads and convert them to customers
+              Manage your customers invoices
             </p>
           </div>
         </div>
@@ -225,7 +237,7 @@ export function InvoicesList() {
           label="invoice"
         />
       )}
-      {/* {isAddInvoiceOpen && (
+      {isAddInvoiceOpen && (
         <AddInvoiceForm
           customer={isAddInvoiceOpen}
           open={!!isAddInvoiceOpen}
@@ -236,7 +248,7 @@ export function InvoicesList() {
           }}
         />
       )}
-      {isEditInvoiceOpen && (
+      {/* {isEditInvoiceOpen && (
         <EditInvoiceForm
           invoice={isEditInvoiceOpen}
           open={!!isEditInvoiceOpen}
@@ -246,8 +258,8 @@ export function InvoicesList() {
             refreshInvoices();
           }}
         />
-      )}
-      {isDeleteInvoiceOpen && (
+      )} */}
+      {/* {isDeleteInvoiceOpen && (
         <DeleteInvoiceForm
           invoice={isDeleteInvoiceOpen}
           open={!!isDeleteInvoiceOpen}
@@ -258,9 +270,9 @@ export function InvoicesList() {
             refreshInvoices();
           }}
         />
-      )}
+      )} */}
 
-      {isApproveInvoiceOpen && (
+      {/* {isApproveInvoiceOpen && (
         <ApproveInvoiceForm
           invoice={isApproveInvoiceOpen}
           open={!!isApproveInvoiceOpen}
@@ -271,8 +283,8 @@ export function InvoicesList() {
             refreshInvoices();
           }}
         />
-      )}
-
+      )} */}
+{/* 
       <DeleteInvoicesByBatchForm
         selectedIds={selectedInvoiceIds}
         open={isDeleteBatchFormOpen}

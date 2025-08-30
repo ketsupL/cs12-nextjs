@@ -17,6 +17,7 @@ export type Invoice = {
   job_name: string;
   status: InvoiceStatus;
   notes?: string;
+  paid_amount: string;
   tasks: TaskFillable[];
   tasks_total_price?: string;
   site_address?: string;

@@ -1,6 +1,6 @@
 import { SortableInvoiceColumn } from "@/hooks/useInvoice";
 import axios from "@/lib/axios";
-import { PaginatedInvoiceResponse } from "@/types/invoices";
+import { InvoiceAdd, PaginatedInvoiceResponse } from "@/types/invoices";
 import { jsonResponse, JsonResponse } from "@/utils/response";
 
 export async function getInvoicesByPagination(
@@ -31,6 +31,21 @@ export async function getInvoicesByPagination(
 
   return jsonResponse<PaginatedInvoiceResponse>({
     data: res.data as PaginatedInvoiceResponse,
+    status: "success",
+  });
+}
+
+export async function createInvoice(formData: InvoiceAdd, customerId: number) {
+  const res = await axios.post(`/api/invoices/${customerId}`, formData);
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to create customer",
+    });
+  }
+  return jsonResponse({
+    data: null,
     status: "success",
   });
 }

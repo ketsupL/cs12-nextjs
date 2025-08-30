@@ -144,16 +144,19 @@ export function AddJobForm({
                   disabled
                   required
                 />
-              </div>
+              </div>{" "}
               <div className="space-y-2">
-                <Label htmlFor="email">Email </Label>
+                <Label htmlFor="due_date">End Date *</Label>
                 <Input
-                  id="email"
-                  name="email"
-                  value={customer.email as string}
-                  disabled
+                  min={today}
+                  name="due_date"
+                  id="due_date"
+                  onChange={handleChange}
                   required
-                />
+                  max={maxDate}
+                  className="w-fit"
+                  type="date"
+                ></Input>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -177,19 +180,6 @@ export function AddJobForm({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="due_date">End Date *</Label>
-                <Input
-                  min={today}
-                  name="due_date"
-                  id="due_date"
-                  onChange={handleChange}
-                  required
-                  max={maxDate}
-                  className="w-fit"
-                  type="date"
-                ></Input>
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select
