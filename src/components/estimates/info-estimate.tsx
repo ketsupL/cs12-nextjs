@@ -31,6 +31,8 @@ interface InfoEstimateProps {
   onOpenChange: (open: boolean) => void;
   setIsDeleteEstimateOpen: Setter<Estimate | false>;
   setIsEditEstimateOpen: Setter<Estimate | false>;
+  setIsApproveEstimateOpen: Setter<Estimate | false>;
+
   onButtonsClick: <T>(setter: Setter<T>, value: T) => void;
 }
 
@@ -39,6 +41,7 @@ export function InfoEstimate({
   open,
   onOpenChange,
   setIsEditEstimateOpen,
+  setIsApproveEstimateOpen,
   setIsDeleteEstimateOpen,
   onButtonsClick,
 }: InfoEstimateProps) {
@@ -231,7 +234,12 @@ export function InfoEstimate({
             >
               Cancel
             </Button>
-            <Button type="button" className="bg-primary">
+            <Button
+              disabled={estimate.status === "approved"}
+              onClick={() => setIsApproveEstimateOpen(estimate)}
+              type="button"
+              className="bg-primary"
+            >
               {/* {isSubmitting ? "Creating..." : "Create Estimate"} */}
               Approve Estimate
             </Button>

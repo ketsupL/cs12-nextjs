@@ -1,26 +1,25 @@
 import { Customer } from "./database";
-import { TaskFillable } from "./tasks";
 
-export type Estimate = {
+export type Job = {
   id: number;
   customer: Pick<
     Customer,
     "id" | "first_name" | "last_name" | "email" | "property_address"
   >;
   job_name: string;
-  status: EstimateStatus;
+  status: JobStatus;
   notes?: string;
-  tasks: TaskFillable[];
   site_address?: string;
+  due_date: string;
   updated_at: Date;
   created_at: Date;
 };
 
-export type EstimateStatus = "draft" | "sent" | "approved" | "rejected";
+export type JobStatus = "pending" | "in_progress" | "completed" | "cancelled";
 
-export interface PaginatedEstimateResponse {
+export interface PaginatedJobResponse {
   current_page: number;
-  data: Estimate[];
+  data: Job[];
   first_page_url: string;
   from: number;
   last_page: number;
@@ -33,22 +32,19 @@ export interface PaginatedEstimateResponse {
   total: number;
 }
 
-export const ESTIMATE_STATUSES = [
-  { value: "draft", label: "Draft", color: "bg-blue-100 text-blue-800" },
+export const JOB_STATUSES = [
+  { value: "pending", label: "Pending", color: "bg-blue-100 text-blue-800" },
   {
-    value: "sent",
-    label: "Sent",
+    value: "in_progress",
+    label: "In Progress",
     color: "bg-yellow-100 text-yellow-800",
   },
   {
-    value: "approved",
-    label: "Approved",
+    value: "completed",
+    label: "Completed",
     color: "bg-green-100 text-green-800",
   },
-  { value: "rejected", label: "Rejected", color: "bg-red-100 text-red-800" },
+  { value: "cancelled", label: "Cancelled", color: "bg-neutral-100 text-neutral-800" },
 ] as const;
 
-export type EstimateAdd = Omit<
-  Estimate,
-  "id" | "customer" | "created_at" | "updated_at"
->;
+export type JobAdd = Omit<Job, "id" | "customer" | "created_at" | "updated_at">;

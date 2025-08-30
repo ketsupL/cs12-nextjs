@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Estimate } from "@/types/estimates";
+import { useEstimates } from "@/hooks/useEstimates";
 
 interface ApproveEstimateFormProps {
   estimate: Estimate;
@@ -29,6 +30,7 @@ export default function ApproveEstimateForm({
   const [isApproving, setIsApproving] = useState(false);
   const [dueDate, setDueDate] = useState("");
   const [email, setEmail] = useState(estimate.customer.email || "");
+  const { handleApproveEstimate } = useEstimates();
   const handleApprove = async (e: FormEvent) => {
     e.preventDefault();
     setIsApproving(true);
@@ -38,8 +40,7 @@ export default function ApproveEstimateForm({
         setIsApproving(false);
         return;
       }
-      // const success = await handleApproveEstimate(estimate.id, address, email, estimate);
-      const success = true;
+      const success = await handleApproveEstimate(estimate.id, dueDate);
       if (success) {
         onSuccess();
       }
@@ -50,7 +51,16 @@ export default function ApproveEstimateForm({
       setIsApproving(false);
     }
   };
-  const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+  const now = new Date();
+
+  const today = now.toISOString().split("T")[0]; // "YYYY-MM-DD"
+  const maxDate = new Date(
+    now.getFullYear() + 25, // add 5 years
+    now.getMonth(),
+    now.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,11 +88,14 @@ export default function ApproveEstimateForm({
             />
           </div>
           <div className="space-y-2 flex flex-col">
-            <Label htmlFor="address">Due Date *</Label>
+            <Label htmlFor="date">Due Date *</Label>
             <Input
               min={today}
+              id="date"
+              name="date"
               onChange={(e) => setDueDate(e.target.value)}
               required
+              max={maxDate}
               className="w-fit"
               type="date"
             />

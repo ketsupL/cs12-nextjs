@@ -4,56 +4,20 @@ import { useState, useEffect, useCallback } from "react";
 import { Lead } from "@/types/leads";
 
 import toast from "react-hot-toast";
-import { CreateLeadData, UpdateLeadData } from "@/types/leads";
-import {
-  convertLeadToCustomer,
-  createLead,
-  deleteLead,
-  deleteLeads,
-  getLeadsByPagination,
-  updateLead,
-} from "@/services/leads";
 import { useDebounce } from "./useDebounce";
 import {
   approveEstimate,
   getEstimatesByPagination,
 } from "@/services/estimates";
-import { Estimate, EstimateAdd } from "@/types/estimates";
+import { Estimate,  } from "@/types/estimates";
 
 export interface SortableEstimateColumn {
-  key: keyof Lead;
+  key: keyof Estimate;
   columnName: string;
   sortBy?: "asc" | "desc";
 }
 
-// export interface UseLeadsReturn {
-//   leads: Lead[];
-//   loading: boolean;
-//   error: string | null;
-//   totalCount: number;
-//   currentPage: number;
-//   totalPages: number;
-//   searchTerm: string;
-//   sortConfig: SortableLeadColumn[];
-//   selectedRows: Set<string>;
-//   perPage: number;
-//   // Actions
-//   setLeads: (leads: Lead[]) => void;
-//   setCurrentPage: (page: number) => void;
-//   setSearchTerm: (term: string) => void;
-//   setSortConfig: (config: SortableLeadColumn[]) => void;
-//   setSelectedRows: (rows: Set<string>) => void;
-//   refreshEstimates: () => Promise<void>;
-//   handleCreateLead: (leadData: CreateLeadData) => Promise<boolean>;
-//   handleUpdateLead: (id: number, leadData: UpdateLeadData) => Promise<boolean>;
-//   handleDeleteLead: (id: number) => Promise<boolean>;
-//   handleDeleteSelectedLeads: () => Promise<boolean>;
-//   handleConvertLead: (
-//     id: number,
-//     customerData?: Record<string, unknown>
-//   ) => Promise<boolean>;
-//   setPerPage: (pageNumber: number) => void;
-// }
+
 
 export const useEstimates = () => {
   const [estimate, setEstimate] = useState<Estimate[]>([]);
@@ -102,13 +66,11 @@ export const useEstimates = () => {
 
   const handleApproveEstimate = useCallback(
     async (
-      customerId: number,
       estimateId: number,
       due_date: string
     ): Promise<boolean> => {
       try {
         const response = await approveEstimate(
-          customerId,
           estimateId,
           due_date
         );
@@ -161,5 +123,6 @@ export const useEstimates = () => {
     setSelectedRows,
     refreshEstimates,
     setPerPage,
+    handleApproveEstimate,
   };
 };

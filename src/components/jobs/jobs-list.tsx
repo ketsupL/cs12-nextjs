@@ -13,55 +13,49 @@ import { Badge } from "@/components/ui/badge";
 import { useEstimates } from "@/hooks/useEstimates";
 import { Estimate, ESTIMATE_STATUSES } from "@/types/estimates";
 import Link from "next/link";
-import SearchCustomerForm from "./search-customer-form";
 import { currencyCharacter, Customer } from "@/types/database";
-import { AddEstimateForm } from "./add-estimate-form";
+import { Job, JOB_STATUSES } from "@/types/jobs";
+import { useJobs } from "@/hooks/useJobs";
+import { formatToPHDate } from "@/utils/date";
+import { AddJobForm } from "./add-job-form";
 import { wait } from "@/utils/promise";
-import { EditEstimateForm } from "./edit-estimate-form";
-import DeleteEstimateForm from "./delete-estimate-form";
-import DeleteEstimatesByBatchForm from "./batch-delete-estimate-form";
-import { InfoEstimate } from "./info-estimate";
-import ApproveEstimateForm from "./approve-estimate-form";
+import SearchCustomerForm from "../estimates/search-customer-form";
 
-export function EstimatesList() {
+export function JobsList() {
   const {
-    estimate,
+    job,
     currentPage,
     setCurrentPage,
     sortConfig,
     searchTerm,
     setSearchTerm,
     loading,
-    refreshEstimates,
+    refreshJobs,
     setPerPage,
     setSortConfig,
     perPage,
     totalCount,
-  } = useEstimates();
-  console.log(estimate);
-  const [isInfoEstimateShown, setIsInfoEstimateShown] = useState<
-    Estimate | false
-  >(false);
-  const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
-  const [isAddEstimateOpen, setIsAddEstimateOpen] = useState<Customer | false>(
+  } = useJobs();
+  console.log(job);
+  const [isInfoEstimateShown, setIsInfoEstimateShown] = useState<Job | false>(
     false
   );
-  const [isEditEstimateOpen, setIsEditEstimateOpen] = useState<
-    Estimate | false
-  >(false);
-  const [isDeleteEstimateOpen, setIsDeleteEstimateOpen] = useState<
-    Estimate | false
-  >(false);
-  const [isDeleteBatchFormOpen, setIsDeleteBatchFormOpen] = useState(false);
-  const [selectedEstimateIds, setSelectedEstimateIds] = useState<Set<string>>(
-    new Set()
+  const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
+  const [isAddJobOpen, setIsAddJobOpen] = useState<Customer | false>(false);
+  const [isEditEstimateOpen, setIsEditEstimateOpen] = useState<Job | false>(
+    false
   );
+  const [isDeleteEstimateOpen, setIsDeleteEstimateOpen] = useState<Job | false>(
+    false
+  );
+  const [isDeleteBatchFormOpen, setIsDeleteBatchFormOpen] = useState(false);
+  const [selectedJobIds, setSelectedJobIds] = useState<Set<string>>(new Set());
   const [isApproveEstimateOpen, setIsApproveEstimateOpen] = useState<
     Estimate | false
   >(false);
   // Get status badge component
   const getStatusBadge = (status: string) => {
-    const statusConfig = ESTIMATE_STATUSES.find((s) => s.value === status);
+    const statusConfig = JOB_STATUSES.find((s) => s.value === status);
     if (!statusConfig) return <Badge variant="secondary">{status}</Badge>;
 
     return (
@@ -72,33 +66,33 @@ export function EstimatesList() {
   };
 
   // Column configuration for DataTableV2
-  const columns: DataTableColumn<Estimate>[] = [
+  const columns: DataTableColumn<Job>[] = [
     {
       key: "customer_id",
       label: "Customer ID",
       sortable: true,
-      render: (value: unknown, estimate: Estimate) => (
-        <div className="flex flex-col gap-1">{estimate.customer?.id}</div>
+      render: (value: unknown, job: Job) => (
+        <div className="flex flex-col gap-1">{job.customer?.id}</div>
       ),
     },
     {
       key: "customer_first_name",
       label: "Name",
       sortable: true,
-      render: (value: unknown, estimate: Estimate) => (
+      render: (value: unknown, job: Job) => (
         <div>
           <Link
             onClick={(e) => {
               e.stopPropagation();
             }}
-            href={`customers/${estimate.customer?.id}`}
+            href={`customers/${job.customer?.id}`}
             className="font-medium hover:underline"
           >
-            {estimate.customer.first_name + " " + estimate.customer.last_name}
+            {job.customer.first_name + " " + job.customer.last_name}
           </Link>
-          {estimate.customer.email && (
+          {job.customer.email && (
             <div className="text-sm text-muted-foreground ">
-              {estimate.customer.email}
+              {job.customer.email}
             </div>
           )}
         </div>
@@ -106,10 +100,10 @@ export function EstimatesList() {
     },
     {
       key: "job_name",
-      label: "Title",
+      label: "Job",
       sortable: true,
-      render: (value: unknown, estimate: Estimate) => (
-        <div className="flex flex-col gap-1">{estimate.job_name}</div>
+      render: (value: unknown, job: Job) => (
+        <div className="flex flex-col gap-1">{job.job_name}</div>
       ),
     },
     {
@@ -119,53 +113,45 @@ export function EstimatesList() {
       render: (value: unknown) => getStatusBadge(value as string),
     },
     {
-      key: "tasks_total_price",
-      label: "Estimates",
+      key: "due_date",
+      label: "Due Date",
       sortable: true,
-      render: (value: unknown) => {
-        const num = Number(value) || 0;
-
-        return (
-          <span className="text-sm">
-            {currencyCharacter}
-            {num.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
-        );
-      },
+      render: (value: unknown, job: Job) => (
+        <div className="flex flex-col gap-1">
+          {formatToPHDate(job.due_date)}
+        </div>
+      ),
     },
   ];
 
-  const actions: DataTableAction<Estimate>[] = [
+  const actions: DataTableAction<Job>[] = [
     {
       icon: Edit,
-      label: "Edit Estimate",
-      onClick: (estimate: Estimate) => setIsEditEstimateOpen(estimate),
+      label: "Edit Job",
+      onClick: (job: Job) => setIsEditEstimateOpen(job),
     },
 
-    {
-      icon: FileCheck,
-      label: "Approve Estimate",
-      disabled: (estimate: Estimate) => estimate.status === "approved",
-      onClick: async (estimate: Estimate) => setIsApproveEstimateOpen(estimate),
-    },
+    // {
+    //   icon: FileCheck,
+    //   label: "Approve Job",
+    //   disabled: (job: Job) => job.status === "completed",
+    //   onClick: async (job: Job) => setIsApproveEstimateOpen(job),
+    // },
     {
       icon: Trash2,
-      label: "Delete Estimate",
+      label: "Delete Job",
 
-      onClick: async (estimate: Estimate) => setIsDeleteEstimateOpen(estimate),
+      onClick: async (job: Job) => setIsDeleteEstimateOpen(job),
     },
   ];
 
   // Batch action configuration for DataTableV2
-  const batchActions: DataTableBatchAction<Estimate>[] = [
+  const batchActions: DataTableBatchAction<Job>[] = [
     {
       icon: Trash2,
-      label: "Delete Estimates",
+      label: "Delete Jobs",
       onClick: (selectedIds: string[]) => {
-        setSelectedEstimateIds(new Set(selectedIds));
+        setSelectedJobIds(new Set(selectedIds));
         setIsDeleteBatchFormOpen(true);
       },
       show: (count: number) => count > 0,
@@ -178,7 +164,7 @@ export function EstimatesList() {
       <div>
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Estimates</h1>
+            <h1 className="text-2xl font-bold">Jobs</h1>
             <p className="text-muted-foreground">
               Manage your sales leads and convert them to customers
             </p>
@@ -186,7 +172,7 @@ export function EstimatesList() {
         </div>
       </div>
 
-      {isInfoEstimateShown && (
+      {/* {isInfoJobShown && (
         <InfoEstimate
           estimate={isInfoEstimateShown}
           open={!!isInfoEstimateShown}
@@ -200,7 +186,7 @@ export function EstimatesList() {
             setModalOpen(value);
           }}
         />
-      )}
+      )} */}
 
       {/* Add Estimate Customer ID Form */}
       {isAddConfirmationOpen && (
@@ -210,35 +196,35 @@ export function EstimatesList() {
           onSuccess={async (customer) => {
             setIsAddConfirmationOpen(false);
             await wait(200);
-            setIsAddEstimateOpen(customer);
+            setIsAddJobOpen(customer);
           }}
-          label="estimate"
+          label="job"
         />
       )}
-      {isAddEstimateOpen && (
-        <AddEstimateForm
-          customer={isAddEstimateOpen}
-          open={!!isAddEstimateOpen}
-          onOpenChange={() => setIsAddEstimateOpen(false)}
+      {isAddJobOpen && (
+        <AddJobForm
+          customer={isAddJobOpen}
+          open={!!isAddJobOpen}
+          onOpenChange={() => setIsAddJobOpen(false)}
           onSuccess={() => {
-            setIsAddEstimateOpen(false);
-            refreshEstimates();
+            setIsAddJobOpen(false);
+            refreshJobs();
           }}
         />
       )}
-      {/* Edit Lead Form */}
-      {isEditEstimateOpen && (
+
+      {/* {isEditEstimateOpen && (
         <EditEstimateForm
           estimate={isEditEstimateOpen}
           open={!!isEditEstimateOpen}
           onOpenChange={() => setIsEditEstimateOpen(false)}
           onSuccess={() => {
             setIsEditEstimateOpen(false);
-            refreshEstimates();
+            refreshJobs();
           }}
         />
-      )}
-      {isDeleteEstimateOpen && (
+      )} */}
+      {/* {isDeleteEstimateOpen && (
         <DeleteEstimateForm
           estimate={isDeleteEstimateOpen}
           open={!!isDeleteEstimateOpen}
@@ -246,45 +232,44 @@ export function EstimatesList() {
           onSuccess={() => {
             setIsDeleteEstimateOpen(false);
             setIsInfoEstimateShown(false);
-            refreshEstimates();
+            refreshJobs();
           }}
         />
-      )}
+      )} */}
 
-      {isApproveEstimateOpen && (
+      {/* {isApproveEstimateOpen && (
         <ApproveEstimateForm
           estimate={isApproveEstimateOpen}
           open={!!isApproveEstimateOpen}
           onOpenChange={() => setIsApproveEstimateOpen(false)}
           onSuccess={() => {
             setIsApproveEstimateOpen(false);
-            setIsInfoEstimateShown(false);
-            refreshEstimates();
+            setIsInfoEstimateShown(false)
+            refreshJobs();
           }}
         />
-      )}
+      )} */}
 
-      {/* Delete Customers Form */}
-      <DeleteEstimatesByBatchForm
+      {/* <DeleteEstimatesByBatchForm
         selectedIds={selectedEstimateIds}
         open={isDeleteBatchFormOpen}
         onOpenChange={setIsDeleteBatchFormOpen}
         onSuccess={() => {
           setIsDeleteBatchFormOpen(false);
           setSelectedEstimateIds(new Set());
-          refreshEstimates();
+          refreshJobs();
         }}
-      />
+      /> */}
       {/* Data Table */}
-      <DataTableV2<Estimate>
-        data={estimate}
+      <DataTableV2<Job>
+        data={job}
         columns={columns}
         actions={actions}
         batchActions={batchActions}
         loading={loading}
-        loadingMessage="Loading estimates..."
-        emptyMessage="No estimates found. Add your first lead!"
-        searchPlaceholder="Search estimates..."
+        loadingMessage="Loading leads..."
+        emptyMessage="No leads found. Add your first lead!"
+        searchPlaceholder="Search leads..."
         idField="id"
         searchable={true}
         serverSide={true}
@@ -299,7 +284,7 @@ export function EstimatesList() {
           } else {
             setSortConfig([
               {
-                key: sortKey as keyof Estimate | "job_name",
+                key: sortKey as keyof Job | "job_name",
                 columnName: sortKey,
                 sortBy: direction,
               },
@@ -308,7 +293,7 @@ export function EstimatesList() {
         }}
         searchTerm={searchTerm}
         showAddButton={true}
-        addButtonLabel="Add Estimate"
+        addButtonLabel="Add Job"
         onAddClick={() => setIsAddConfirmationOpen(true)}
         sortKey={
           sortConfig.length > 0 ? (sortConfig[0].key as string) : undefined
@@ -317,8 +302,8 @@ export function EstimatesList() {
         pagination={true}
         pageSize={perPage}
         pageSizeOptions={[10, 25, 50, 100]}
-        onRowClick={(estimate) => {
-          setIsInfoEstimateShown(estimate);
+        onRowClick={(job) => {
+          setIsInfoEstimateShown(job);
         }}
       />
     </div>

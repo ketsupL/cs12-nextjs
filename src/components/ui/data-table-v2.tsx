@@ -27,13 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-  X,
-  Plus,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
+import { Search, X, Plus, ChevronUp, ChevronDown } from "lucide-react";
 
 // Types
 export interface DataTableColumn<T = Record<string, unknown>> {
@@ -46,9 +40,10 @@ export interface DataTableColumn<T = Record<string, unknown>> {
 }
 
 export interface DataTableAction<T = Record<string, unknown>> {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; color?: string }>;
   label: string;
   onClick: (row: T) => void;
+  disabled?: (row: T) => boolean;
   variant?: "ghost" | "default" | "destructive" | "outline" | "secondary";
   show?: (row: T) => boolean;
 }
@@ -567,9 +562,11 @@ export function DataTableV2<T extends Record<string, unknown>>({
                           {actions.map((action, actionIndex) => {
                             const show = action.show ? action.show(row) : true;
                             if (!show) return null;
-
+                            const disabled = action.disabled
+                              ? action.disabled(row)
+                              : false;
                             const IconComponent = action.icon;
-                            return (
+                            return !disabled ? (
                               <Tooltip key={actionIndex}>
                                 <TooltipTrigger asChild>
                                   <Button
@@ -577,7 +574,6 @@ export function DataTableV2<T extends Record<string, unknown>>({
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={(e) => {
-
                                       e.stopPropagation();
                                       action.onClick(row);
                                     }}
@@ -589,6 +585,21 @@ export function DataTableV2<T extends Record<string, unknown>>({
                                   <p>{action.label}</p>
                                 </TooltipContent>
                               </Tooltip>
+                            ) : (
+                              <Button
+                                key={actionIndex}
+                                variant={action.variant || "ghost"}
+                                size="icon"
+                                className="h-8 w-8 hover:bg-transparent"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <IconComponent
+                                  color="#5E5E5E"
+                                  className="h-4 w-4"
+                                />
+                              </Button>
                             );
                           })}
                         </div>

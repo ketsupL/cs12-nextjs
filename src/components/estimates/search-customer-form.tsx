@@ -18,11 +18,13 @@ interface ConvertLeadFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (customer: Customer) => void;
+  label:string,
 }
 export default function SearchCustomerForm({
   open,
   onOpenChange,
   onSuccess,
+  label,
 }: ConvertLeadFormProps) {
   const [isSearching, setIsSearching] = useState(false);
   const { handleSearchCustomer } = useCustomers();
@@ -56,9 +58,9 @@ export default function SearchCustomerForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="">
         <DialogHeader>
-          <DialogTitle>Add Estimate</DialogTitle>
+          <DialogTitle>Add {label.charAt(0).toUpperCase() + label.slice(1)}</DialogTitle>
           <DialogDescription className="text-muted-foreground data-[state=closed]:duration-[0ms]">
-            Please enter customer id to add estimate.
+            Please enter customer id to add {label}.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

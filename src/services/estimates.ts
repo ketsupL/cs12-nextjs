@@ -109,21 +109,17 @@ export async function deleteEstimates(
 }
 
 export async function approveEstimate(
-  customerId: number,
   estimateId: number,
   due_date: string
 ): Promise<JsonResponse<null>> {
-  const res = await axios.patch(
-    `/api/estimates/${customerId}/${estimateId}/approve`,
-    {
-      due_date,
-    }
-  );
+  const res = await axios.patch(`/api/estimates/${estimateId}/approve`, {
+    due_date,
+  });
   if (res.status !== 200) {
     return jsonResponse({
       data: null,
       status: "error",
-      message: "Failed to delete lead",
+      message: "Failed to approve estimate",
     });
   }
   return jsonResponse({
