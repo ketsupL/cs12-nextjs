@@ -11,6 +11,7 @@ export type Estimate = {
   status: EstimateStatus;
   notes?: string;
   tasks: TaskFillable[];
+  tasks_total_price?: string;
   site_address?: string;
   updated_at: Date;
   created_at: Date;

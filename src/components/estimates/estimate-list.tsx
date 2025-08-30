@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Edit, FileCheck, Trash2 } from "lucide-react";
-import { Lead } from "@/types/leads";
 import {
   DataTableV2,
   type DataTableColumn,
@@ -70,7 +69,7 @@ export function EstimatesList() {
       </Badge>
     );
   };
-
+  console.log(estimate)
   // Column configuration for DataTableV2
   const columns: DataTableColumn<Estimate>[] = [
     {

@@ -18,13 +18,14 @@ export type Invoice = {
   status: InvoiceStatus;
   notes?: string;
   tasks: TaskFillable[];
+  tasks_total_price?: string;
   site_address?: string;
   due_date: string;
   updated_at: Date;
   created_at: Date;
 };
 
-export interface PaginatedInvoicesResponse {
+export interface PaginatedInvoiceResponse {
   current_page: number;
   data: Invoice[];
   first_page_url: string;

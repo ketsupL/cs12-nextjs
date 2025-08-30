@@ -7,9 +7,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import {
-  Calendar,
   Clock,
-  DollarSign,
   FileText,
   Mail,
   MapPin,
