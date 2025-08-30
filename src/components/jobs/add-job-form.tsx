@@ -67,7 +67,7 @@ export function AddJobForm({
 
     try {
       // Validate required fields
-      if (!formData.job_name || !formData.status || !formData.due_date) {
+      if (!formData.job_name || !formData.status || formData.due_date) {
         toast.error("Please fill in all required fields");
         setIsSubmitting(false);
         return;
@@ -178,7 +178,7 @@ export function AddJobForm({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="due_date">Due Date *</Label>
+                <Label htmlFor="due_date">End Date *</Label>
                 <Input
                   min={today}
                   name="due_date"

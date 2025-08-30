@@ -73,7 +73,7 @@ export default function DeleteEstimatesByBatchForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant={'ghost'}>Cancel</Button>
           </DialogClose>
           <Button

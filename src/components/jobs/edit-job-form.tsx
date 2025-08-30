@@ -177,7 +177,7 @@ export function EditJobForm({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="due_date">Due Date *</Label>
+                <Label htmlFor="due_date">End Date *</Label>
                 <Input
                   min={today}
                   name="due_date"

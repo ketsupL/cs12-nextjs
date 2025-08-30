@@ -10,24 +10,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Customer } from "@/types/database";
-import { deleteCustomers } from "@/services/customers";
-type DeleteCustomersProps = {
+import { deleteLeads } from "@/services/leads";
+type DeleteLeadsProps = {
   selectedIds?: Set<string>;
   onSuccess: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  setData?: (setter: (data: Customer[]) => Customer[]) => void;
 };
 
-export default function DeleteCustomersByBatchForm({
+export default function DeleteLeadsByBatchForm({
   selectedIds,
   onSuccess,
   open,
   onOpenChange,
-  setData,
-}: DeleteCustomersProps) {
-  const customersToDelete = selectedIds || new Set<string>();
+}: DeleteLeadsProps) {
+  const leadToDelete = selectedIds || new Set<string>();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (e: React.FormEvent) => {
@@ -35,30 +32,26 @@ export default function DeleteCustomersByBatchForm({
     setIsDeleting(true);
 
     try {
-      // Create customer with proper error handling
-      const response = await deleteCustomers(customersToDelete);
+      // Create lead with proper error handling
+      const response = await deleteLeads(leadToDelete);
 
       if (response.status === "error") {
-        throw new Error(response.message || "Failed to delete customers");
+        throw new Error(response.message || "Failed to delete lead");
       }
 
       // Optimistacally Update
-      if (setData) {
-        setData((customers) =>
-          customers.filter((customer) => !selectedIds?.has(String(customer.id)))
-        );
-      }
-      // Success! The customer was created
-      toast.success("Customer deleted successfully");
+
+      // Success! The lead was created
+      toast.success("Estimate deleted successfully");
 
       // Close the modal and close the page
       onSuccess();
     } catch (error) {
-      console.error("Error deleting customers:", error);
+      console.error("Error deleting lead:", error);
       toast.error(
         typeof error === "object" && error !== null && "message" in error
           ? String(error.message)
-          : "Failed to delete customers. Please try again."
+          : "Failed to delete lead. Please try again."
       );
     } finally {
       setIsDeleting(false);
@@ -70,12 +63,12 @@ export default function DeleteCustomersByBatchForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Delete {customersToDelete.size}{" "}
-            {customersToDelete.size > 1 ? "customers" : "customer"}?
+            Delete {leadToDelete.size}{" "}
+            {leadToDelete.size > 1 ? "leads" : "lead"}?
           </DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            customers and remove the data from our servers.
+            This action cannot be undone. This will permanently delete the lead
+            and remove the data from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

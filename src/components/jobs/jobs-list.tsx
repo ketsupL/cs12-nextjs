@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Edit, FileCheck, Trash2 } from "lucide-react";
-import { Lead } from "@/types/leads";
+import { Edit, Trash2 } from "lucide-react";
 import {
   DataTableV2,
   type DataTableColumn,
@@ -10,8 +9,6 @@ import {
   type DataTableBatchAction,
 } from "@/components/ui/data-table-v2";
 import { Badge } from "@/components/ui/badge";
-import { useEstimates } from "@/hooks/useEstimates";
-import { Estimate, ESTIMATE_STATUSES } from "@/types/estimates";
 import Link from "next/link";
 import { Customer } from "@/types/database";
 import { Job, JOB_STATUSES } from "@/types/jobs";
@@ -23,6 +20,7 @@ import SearchCustomerForm from "../estimates/search-customer-form";
 import { EditJobForm } from "./edit-job-form";
 import DeleteJobForm from "./delete-job-form";
 import DeleteJobsByBatchForm from "./batch-delete-job";
+import { InfoJob } from "./info-job";
 
 export function JobsList() {
   const {
@@ -39,8 +37,7 @@ export function JobsList() {
     perPage,
     totalCount,
   } = useJobs();
-  console.log(job);
-  const [isInfoEstimateShown, setIsInfoEstimateShown] = useState<Job | false>(
+  const [isInfoJobShown, setIsInfoJobShown] = useState<Job | false>(
     false
   );
   const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
@@ -111,7 +108,7 @@ export function JobsList() {
     },
     {
       key: "due_date",
-      label: "Due Date",
+      label: "End Date",
       sortable: true,
       render: (value: unknown, job: Job) => (
         <div className="flex flex-col gap-1">
@@ -167,21 +164,20 @@ export function JobsList() {
         </div>
       </div>
 
-      {/* {isInfoJobShown && (
-        <InfoEstimate
-          estimate={isInfoEstimateShown}
-          open={!!isInfoEstimateShown}
-          setIsApproveEstimateOpen={setIsApproveEstimateOpen}
+      {isInfoJobShown && (
+        <InfoJob
+          job={isInfoJobShown}
+          open={!!isInfoJobShown}
           setIsEditJobOpen={setIsEditJobOpen}
           setIsDeleteJobOpen={setIsDeleteJobOpen}
-          onOpenChange={() => setIsInfoEstimateShown(false)}
+          onOpenChange={() => setIsInfoJobShown(false)}
           onButtonsClick={async (setModalOpen, value) => {
-            setIsInfoEstimateShown(false);
+            setIsInfoJobShown(false);
             await wait(200);
             setModalOpen(value);
           }}
         />
-      )} */}
+      )}
 
       {/* Add Estimate Customer ID Form */}
       {isAddConfirmationOpen && (
@@ -226,24 +222,24 @@ export function JobsList() {
           onOpenChange={() => setIsDeleteJobOpen(false)}
           onSuccess={() => {
             setIsDeleteJobOpen(false);
-            setIsInfoEstimateShown(false);
+            setIsInfoJobShown(false);
             refreshJobs();
           }}
         />
       )}
 
-   
-
-      <DeleteJobsByBatchForm
-        selectedIds={selectedJobIds}
-        open={isDeleteBatchFormOpen}
-        onOpenChange={setIsDeleteBatchFormOpen}
-        onSuccess={() => {
-          setIsDeleteBatchFormOpen(false);
-          setSelectedJobIds(new Set());
-          refreshJobs();
-        }}
-      />
+      {isDeleteBatchFormOpen && (
+        <DeleteJobsByBatchForm
+          selectedIds={selectedJobIds}
+          open={isDeleteBatchFormOpen}
+          onOpenChange={setIsDeleteBatchFormOpen}
+          onSuccess={() => {
+            setIsDeleteBatchFormOpen(false);
+            setSelectedJobIds(new Set());
+            refreshJobs();
+          }}
+        />
+      )}
       {/* Data Table */}
       <DataTableV2<Job>
         data={job}
@@ -287,7 +283,7 @@ export function JobsList() {
         pageSize={perPage}
         pageSizeOptions={[10, 25, 50, 100]}
         onRowClick={(job) => {
-          setIsInfoEstimateShown(job);
+          setIsInfoJobShown(job);
         }}
       />
     </div>

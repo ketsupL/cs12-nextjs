@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLeads } from "@/hooks/useLeads";
 import DeleteLeadForm from "./delete-lead-form";
 import ConvertLeadForm from "./convert-lead-form";
+import DeleteLeadsByBatchForm from "./batch-delete-lead";
 
 export function LeadsList() {
   const {
@@ -35,8 +36,13 @@ export function LeadsList() {
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [isEditLeadOpen, setIsEditLeadOpen] = useState<Lead | false>(false);
   const [isDeleteLeadOpen, setIsDeleteLeadOpen] = useState<Lead | false>(false);
-  const [isConvertLeadOpen, setIsConvertLeadOpen] = useState<Lead | false>(false);
-
+  const [isConvertLeadOpen, setIsConvertLeadOpen] = useState<Lead | false>(
+    false
+  );
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(
+    new Set()
+  );
+  const [isDeleteBatchFormOpen, setIsDeleteBatchFormOpen] = useState(false);
   // Get status badge component
   const getStatusBadge = (status: string) => {
     const statusConfig = LEAD_STATUSES.find((s) => s.value === status);
@@ -125,7 +131,7 @@ export function LeadsList() {
     {
       icon: UserCheck,
       label: "Convert to Customer",
-      onClick: async (lead: Lead) => setIsConvertLeadOpen(lead)
+      onClick: async (lead: Lead) => setIsConvertLeadOpen(lead),
     },
     {
       icon: Trash2,
@@ -140,7 +146,8 @@ export function LeadsList() {
       icon: Trash2,
       label: "Delete Leads",
       onClick: (selectedIds: string[]) => {
-        console.log("Batch delete clicked for:", selectedIds);
+        setSelectedLeadIds(new Set(selectedIds));
+        setIsDeleteBatchFormOpen(true);
       },
       show: (count: number) => count > 0,
       variant: "destructive",
@@ -189,6 +196,19 @@ export function LeadsList() {
           onOpenChange={() => setIsDeleteLeadOpen(false)}
           onSuccess={() => {
             setIsDeleteLeadOpen(false);
+            refreshLeads();
+          }}
+        />
+      )}
+
+      {isDeleteBatchFormOpen && (
+        <DeleteLeadsByBatchForm
+          selectedIds={selectedLeadIds}
+          open={isDeleteBatchFormOpen}
+          onOpenChange={setIsDeleteBatchFormOpen}
+          onSuccess={() => {
+            setIsDeleteBatchFormOpen(false);
+            setSelectedLeadIds(new Set());
             refreshLeads();
           }}
         />

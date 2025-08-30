@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { deleteJobs } from "@/services/jobs";
-type DeleteEstimatesProps = {
+type DeleteJobsProps = {
   selectedIds?: Set<string>;
   onSuccess: () => void;
   open: boolean;
@@ -24,7 +24,7 @@ export default function DeleteJobsByBatchForm({
   onSuccess,
   open,
   onOpenChange,
-}: DeleteEstimatesProps) {
+}: DeleteJobsProps) {
   const jobToDelete = selectedIds || new Set<string>();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -73,7 +73,7 @@ export default function DeleteJobsByBatchForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant={"ghost"}>Cancel</Button>
           </DialogClose>
           <Button
