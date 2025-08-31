@@ -49,3 +49,58 @@ export async function createInvoice(formData: InvoiceAdd, customerId: number) {
     status: "success",
   });
 }
+
+export async function editInvoice(
+  formData: InvoiceAdd,
+  invoiceId: number,
+  deletedIds: number[] | []
+) {
+  const res = await axios.patch(`/api/invoices/${invoiceId}`, {
+    ...formData,
+    deletedIds,
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to edit invoice",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}
+export async function deleteInvoice(id: number): Promise<JsonResponse<null>> {
+  const res = await axios.delete(`/api/invoices/${id}`);
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to delete estimate",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}
+
+export async function deleteInvoices(
+  ids: Set<string>
+): Promise<JsonResponse<null>> {
+  const res = await axios.delete(`/api/invoices`, {
+    data: { ids: [...ids] },
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to delete invoices",
+    });
+  }
+  return jsonResponse({
+    data: null,
+    status: "success",
+  });
+}

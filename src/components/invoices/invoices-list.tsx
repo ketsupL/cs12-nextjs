@@ -17,6 +17,10 @@ import { Invoice, INVOICE_STATUSES } from "@/types/invoices";
 import SearchCustomerForm from "../estimates/search-customer-form";
 import { formatToPHDate } from "@/utils/date";
 import { AddInvoiceForm } from "./add-invoice-form";
+import { EditInvoiceForm } from "./edit-invoice-form";
+import DeleteInvoiceForm from "./delete-invoice-form";
+import DeleteInvoicesByBatchForm from "./batch-delete-invoice";
+import { InfoInvoice } from "./info-invoice";
 export function InvoicesList() {
   const {
     invoice,
@@ -50,9 +54,7 @@ export function InvoicesList() {
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<Set<string>>(
     new Set()
   );
-  const [isApproveInvoiceOpen, setIsApproveInvoiceOpen] = useState<
-    Invoice | false
-  >(false);
+
   // Get status badge component
   const getStatusBadge = (status: string) => {
     const statusConfig = INVOICE_STATUSES.find((s) => s.value === status);
@@ -127,7 +129,7 @@ export function InvoicesList() {
       key: "paid_amount",
       label: "Paid Amount",
       sortable: true,
-      render: (value: unknown, row) => {
+      render: (value: unknown) => {
         const num = Number(value) || 0;
 
         return (
@@ -209,11 +211,10 @@ export function InvoicesList() {
         </div>
       </div>
 
-      {/* {isInfoInvoiceShown && (
+      {isInfoInvoiceShown && (
         <InfoInvoice
           invoice={isInfoInvoiceShown}
           open={!!isInfoInvoiceShown}
-          setIsApproveInvoiceOpen={setIsApproveInvoiceOpen}
           setIsEditInvoiceOpen={setIsEditInvoiceOpen}
           setIsDeleteInvoiceOpen={setIsDeleteInvoiceOpen}
           onOpenChange={() => setIsInfoInvoiceShown(false)}
@@ -223,7 +224,7 @@ export function InvoicesList() {
             setModalOpen(value);
           }}
         />
-      )} */}
+      )}
 
       {isAddConfirmationOpen && (
         <SearchCustomerForm
@@ -248,7 +249,7 @@ export function InvoicesList() {
           }}
         />
       )}
-      {/* {isEditInvoiceOpen && (
+      {isEditInvoiceOpen && (
         <EditInvoiceForm
           invoice={isEditInvoiceOpen}
           open={!!isEditInvoiceOpen}
@@ -258,8 +259,8 @@ export function InvoicesList() {
             refreshInvoices();
           }}
         />
-      )} */}
-      {/* {isDeleteInvoiceOpen && (
+      )}
+      {isDeleteInvoiceOpen && (
         <DeleteInvoiceForm
           invoice={isDeleteInvoiceOpen}
           open={!!isDeleteInvoiceOpen}
@@ -270,21 +271,8 @@ export function InvoicesList() {
             refreshInvoices();
           }}
         />
-      )} */}
+      )}
 
-      {/* {isApproveInvoiceOpen && (
-        <ApproveInvoiceForm
-          invoice={isApproveInvoiceOpen}
-          open={!!isApproveInvoiceOpen}
-          onOpenChange={() => setIsApproveInvoiceOpen(false)}
-          onSuccess={() => {
-            setIsApproveInvoiceOpen(false);
-            setIsInfoInvoiceShown(false);
-            refreshInvoices();
-          }}
-        />
-      )} */}
-{/* 
       <DeleteInvoicesByBatchForm
         selectedIds={selectedInvoiceIds}
         open={isDeleteBatchFormOpen}
@@ -294,7 +282,8 @@ export function InvoicesList() {
           setSelectedInvoiceIds(new Set());
           refreshInvoices();
         }}
-      /> */}
+      />
+
       {/* Data Table */}
       <DataTableV2<Invoice>
         data={invoice}
