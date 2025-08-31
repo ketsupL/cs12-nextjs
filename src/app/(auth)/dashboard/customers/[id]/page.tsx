@@ -16,14 +16,14 @@ export const runtime = "edge";
 
 export default async function CustomerDetailPage(
   // @ts-expect-error - Next.js 15.3.5 type issue
-  { params }
+  { params, searchParams }
 ) {
   const { id } = await params;
-
+  const { category } = await searchParams;
   const cookieHeader = (await headers()).get("cookie"); // browser cookies
   // Fetch customer, locations, and merged customers data
   const customer = await getCustomerById(id, cookieHeader as string);
-
+  console.log(category);
   if (customer.data == null || customer.status === "error") {
     return (
       <div className="flex flex-1 flex-col items-center justify-center py-20 px-4">

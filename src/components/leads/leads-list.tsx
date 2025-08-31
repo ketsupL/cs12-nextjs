@@ -157,7 +157,7 @@ export function LeadsList() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between ml-2 items-center">
           <div>
             <h1 className="text-2xl font-bold">Leads</h1>
             <p className="text-muted-foreground">

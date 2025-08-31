@@ -37,9 +37,7 @@ export function JobsList() {
     perPage,
     totalCount,
   } = useJobs();
-  const [isInfoJobShown, setIsInfoJobShown] = useState<Job | false>(
-    false
-  );
+  const [isInfoJobShown, setIsInfoJobShown] = useState<Job | false>(false);
   const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
   const [isAddJobOpen, setIsAddJobOpen] = useState<Customer | false>(false);
   const [isEditJobOpen, setIsEditJobOpen] = useState<Job | false>(false);
@@ -79,7 +77,10 @@ export function JobsList() {
             onClick={(e) => {
               e.stopPropagation();
             }}
-            href={`customers/${job.customer?.id}`}
+            href={{
+              pathname: `customers/${job.customer?.id}`,
+              query: { category: "job" },
+            }}
             className="font-medium hover:underline"
           >
             {job.customer.first_name + " " + job.customer.last_name}
@@ -156,7 +157,7 @@ export function JobsList() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between ml-2 items-center">
           <div>
             <h1 className="text-2xl font-bold">Jobs</h1>
             <p className="text-muted-foreground">Manage your customer jobs</p>

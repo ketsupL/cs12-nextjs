@@ -87,7 +87,10 @@ export function InvoicesList() {
             onClick={(e) => {
               e.stopPropagation();
             }}
-            href={`customers/${invoice.customer?.id}`}
+            href={{
+              pathname: `customers/${invoice.customer?.id}`,
+              query: { category: "invoice" },
+            }}
             className="font-medium hover:underline"
           >
             {invoice.customer.first_name + " " + invoice.customer.last_name}
@@ -201,7 +204,7 @@ export function InvoicesList() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between ml-2 items-center">
           <div>
             <h1 className="text-2xl font-bold">Invoices</h1>
             <p className="text-muted-foreground">

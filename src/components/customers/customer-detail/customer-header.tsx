@@ -22,14 +22,10 @@ import {
   Copy,
   Share2,
   UserCheck,
-  UserX,
   MapPin,
   ChevronDown,
-  Users,
-  User,
   CheckCircle2,
   Navigation,
-  Receipt,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -40,8 +36,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { EditCustomerForm } from "@/components/customers/edit-customer-form";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { deleteCustomers } from "@/services/customers";
 import DeleteCustomerForm from "./delete-customer-form";
 
 interface CustomerHeaderProps {
@@ -50,15 +44,15 @@ interface CustomerHeaderProps {
 
 export function CustomerHeader({ customer }: CustomerHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
+  const [customerData, setCustomerData] = useState(customer);
   const getInitials = () => {
-    return `${customer.first_name?.[0] || ""}${
-      customer.last_name?.[0] || ""
+    return `${customerData.first_name?.[0] || ""}${
+      customerData.last_name?.[0] || ""
     }`.toUpperCase();
   };
 
   const handleCopyId = () => {
-    navigator.clipboard.writeText(String(customer.id));
+    navigator.clipboard.writeText(String(customerData.id));
     toast.success("Customer ID copied to clipboard");
   };
 
@@ -67,10 +61,11 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
     setEditModalOpen(true);
   };
 
-  const handleEditComplete = () => {
+  const handleEditComplete = (customer: Customer) => {
     setEditModalOpen(false);
     setEditingCustomer(null);
-    window.location.reload();
+    console.log(customerData)
+    setCustomerData({ ...customer });
   };
 
   const formatDate = (dateString: string) => {
@@ -82,11 +77,9 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
   };
 
   const [addressesOpen, setAddressesOpen] = useState(false);
-  const [contactsOpen, setContactsOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
-  const primaryCustomer = customer;
 
   const openInMaps = (address: string) => {
     const encodedAddress = encodeURIComponent(address);
@@ -94,15 +87,15 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
   };
 
   const addressesMatch =
-    customer.property_address &&
-    customer.billing_address &&
-    customer.property_address === customer.billing_address;
+    customerData.property_address &&
+    customerData.billing_address &&
+    customerData.property_address === customerData.billing_address;
 
   return (
     <>
       {deleteDialogOpen && (
         <DeleteCustomerForm
-          customer={customer}
+          customer={customerData}
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
           onSuccess={() => {
@@ -130,11 +123,11 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
             </div>
             <div className="flex-1">
               <h1 className="text-xl font-bold text-gray-900 leading-tight">
-                {customer.first_name} {customer.last_name}
+                {customerData.first_name} {customerData.last_name}
               </h1>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="outline" className="font-mono text-xs">
-                  {customer.id}
+                  {customerData.id}
                 </Badge>
                 <Badge variant={"default"} className="text-xs">
                   {"Active"}
@@ -146,7 +139,7 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
           {/* Actions */}
           <div className="flex gap-2">
             <Button
-              onClick={() => handleEdit(customer)}
+              onClick={() => handleEdit(customerData)}
               size="sm"
               className="flex-1"
             >
@@ -190,43 +183,43 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
             Contact
           </h3>
           <div className="space-y-2">
-            {customer.phone && (
+            {customerData.phone && (
               <a
-                href={`tel:${customer.phone}`}
+                href={`tel:${customerData.phone}`}
                 className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors p-2 rounded-md hover:bg-gray-50"
               >
                 <Phone className="h-4 w-4" />
-                <span>{customer.phone}</span>
+                <span>{customerData.phone}</span>
               </a>
             )}
 
-            {customer.email && (
+            {customerData.email && (
               <a
-                href={`mailto:${customer.email}`}
+                href={`mailto:${customerData.email}`}
                 className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors p-2 rounded-md hover:bg-gray-50"
               >
                 <Mail className="h-4 w-4" />
-                <span className="truncate">{customer.email}</span>
+                <span className="truncate">{customerData.email}</span>
               </a>
             )}
 
-            {customer.company_name && (
+            {customerData.company_name && (
               <div className="flex items-center gap-3 text-sm text-gray-600 p-2">
                 <Briefcase className="h-4 w-4" />
-                <span>{customer.company_name}</span>
+                <span>{customerData.company_name}</span>
               </div>
             )}
 
-            {customer.lead_source && (
+            {customerData.lead_source && (
               <div className="flex items-center gap-3 text-sm text-gray-600 p-2">
                 <Tag className="h-4 w-4" />
-                <span>{customer.lead_source}</span>
+                <span>{customerData.lead_source}</span>
               </div>
             )}
 
             <div className="flex items-center gap-3 text-sm text-gray-600 p-2">
               <Clock className="h-4 w-4" />
-              <span>Since {formatDate(customer.created_at)}</span>
+              <span>Since {formatDate(customerData.created_at)}</span>
             </div>
           </div>
         </div>
@@ -259,7 +252,7 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
 
           <CollapsibleContent className="mt-2 space-y-3">
             {/* Primary Customer Property Address */}
-            {customer.property_address && (
+            {customerData.property_address && (
               <div className="p-3 bg-gray-50 rounded-md">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -268,7 +261,7 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => openInMaps(customer.property_address!)}
+                    onClick={() => openInMaps(customerData.property_address!)}
                     className="text-xs h-auto p-1"
                   >
                     <Navigation className="h-3 w-3 mr-1" />
@@ -276,19 +269,19 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {customer.property_address}
+                  {customerData.property_address}
                 </p>
               </div>
             )}
 
             {/* Primary Customer Billing Address */}
-            {customer.billing_address && !addressesMatch && (
+            {customerData.billing_address && !addressesMatch && (
               <div className="p-3 bg-gray-50 rounded-md">
                 <span className="text-xs font-medium text-gray-700 uppercase tracking-wider block mb-2">
                   Billing Address
                 </span>
                 <p className="text-sm text-gray-600">
-                  {customer.billing_address}
+                  {customerData.billing_address}
                 </p>
               </div>
             )}
@@ -306,7 +299,7 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
           open={editModalOpen}
           onOpenChange={setEditModalOpen}
           customer={editingCustomer}
-          onSuccess={handleEditComplete}
+          onSuccess={(customer) => handleEditComplete(customer as Customer)}
         />
       )}
     </>

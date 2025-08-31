@@ -29,7 +29,7 @@ interface EditCustomerFormProps {
   customer: Customer;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (customer?: Customer) => void;
 }
 
 export function EditCustomerForm({
@@ -117,7 +117,7 @@ export function EditCustomerForm({
 
       // Call onSuccess to refresh data and close the modal
       if (onSuccess) {
-        onSuccess();
+        onSuccess({ ...customer, ...formData });
       }
       onOpenChange(false);
     } catch (error) {

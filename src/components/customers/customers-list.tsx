@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Trash2,
-} from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useCustomers } from "@/hooks/useCustomers";
 import type { Customer } from "@/types/database";
 import { EditCustomerForm } from "./edit-customer-form";
@@ -11,7 +9,11 @@ import { AddCustomerForm } from "./add-customer-form";
 import DeleteCustomersByBatchForm from "./batch-delete-customers--form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DataTableV2, DataTableColumn, DataTableBatchAction } from "@/components/ui/data-table-v2";
+import {
+  DataTableV2,
+  DataTableColumn,
+  DataTableBatchAction,
+} from "@/components/ui/data-table-v2";
 
 export function CustomersList() {
   const router = useRouter();
@@ -36,8 +38,10 @@ export function CustomersList() {
     Customer | false
   >(false);
   const [isDeleteFormOpen, setIsDeleteFormOpen] = useState(false);
-  const [selectedCustomerIds, setSelectedCustomerIds] = useState<Set<string>>(new Set());
-  console.log(sortConfig)
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<Set<string>>(
+    new Set()
+  );
+  console.log(sortConfig);
   // Column configuration for DataTableV2
   const columns: DataTableColumn<Customer>[] = [
     {
@@ -52,7 +56,10 @@ export function CustomersList() {
       render: (value: unknown, customer: Customer) => (
         <div>
           <Link
-            href={`dashboard/customers/${customer.id}`}
+            href={{
+              pathname: `customers/${customer?.id}`,
+              query: { category: "estimate" },
+            }}
             className="hover:underline  font-medium"
           >
             {customer.first_name} {customer.last_name}
@@ -89,7 +96,12 @@ export function CustomersList() {
         <div className="flex flex-col gap-1">
           {customer.email && (
             <div className="flex items-center gap-2">
-              <a href={`tel:${customer.phone}`} className="text-sm text-blue-600">{customer.phone}</a>
+              <a
+                href={`tel:${customer.phone}`}
+                className="text-sm text-blue-600"
+              >
+                {customer.phone}
+              </a>
             </div>
           )}
         </div>
@@ -142,14 +154,13 @@ export function CustomersList() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between ml-2 items-center">
           <div>
             <h1 className="text-2xl font-bold">Customers</h1>
             <p className="text-muted-foreground">
               Manage your customer database and track customer information
             </p>
           </div>
-      
         </div>
       </div>
 
@@ -189,8 +200,6 @@ export function CustomersList() {
         setData={setCustomers}
       />
 
-      
-
       {/* Data Table */}
       <DataTableV2<Customer & Record<string, unknown>>
         data={customers as (Customer & Record<string, unknown>)[]}
@@ -222,21 +231,25 @@ export function CustomersList() {
           if (direction === null) {
             setSortConfig([]);
           } else {
-            setSortConfig([{
-              key: sortKey as keyof Customer | "name",
-              columnName: sortKey,
-              sortBy: direction
-            }]);
+            setSortConfig([
+              {
+                key: sortKey as keyof Customer | "name",
+                columnName: sortKey,
+                sortBy: direction,
+              },
+            ]);
           }
         }}
         searchTerm={searchTerm}
-        sortKey={sortConfig.length > 0 ? sortConfig[0].key as string : undefined}
+        sortKey={
+          sortConfig.length > 0 ? (sortConfig[0].key as string) : undefined
+        }
         sortDirection={sortConfig.length > 0 ? sortConfig[0].sortBy : undefined}
         onSelectionChange={(selectedIds) => {
           setSelectedCustomerIds(new Set(selectedIds));
         }}
         onRowClick={(customer) => {
-          router.push(`/dashboard/customers/${customer.id}`);
+          router.push(`/dashboard/customers/${customer.id}?category=estimate`);
         }}
       />
     </div>

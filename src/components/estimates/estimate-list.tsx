@@ -69,7 +69,7 @@ export function EstimatesList() {
       </Badge>
     );
   };
-  console.log(estimate)
+  console.log(estimate);
   // Column configuration for DataTableV2
   const columns: DataTableColumn<Estimate>[] = [
     {
@@ -90,7 +90,10 @@ export function EstimatesList() {
             onClick={(e) => {
               e.stopPropagation();
             }}
-            href={`customers/${estimate.customer?.id}`}
+            href={{
+              pathname: `customers/${estimate.customer?.id}`,
+              query: { category: "estimate" },
+            }}
             className="font-medium hover:underline"
           >
             {estimate.customer.first_name + " " + estimate.customer.last_name}
@@ -175,7 +178,7 @@ export function EstimatesList() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between ml-2 items-center">
           <div>
             <h1 className="text-2xl font-bold">Estimates</h1>
             <p className="text-muted-foreground">

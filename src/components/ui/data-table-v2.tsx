@@ -354,7 +354,7 @@ export function DataTableV2<T extends Record<string, unknown>>({
         exportable ||
         showAddButton ||
         batchActions.length > 0) && (
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center px-2 justify-between gap-4">
           <div className="flex items-center gap-4">
             {/* Search */}
             {searchable && (
@@ -453,14 +453,17 @@ export function DataTableV2<T extends Record<string, unknown>>({
       )}
 
       {/* Table */}
-      <div className="rounded-md border relative">
+      <div className="rounded-md border mx-2 relative">
         {loading && (
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-background/80 rounded-md 
+          backdrop-blur-sm z-10 flex items-center justify-center"
+          >
             <Loader variant="pulse" size="lg" text={loadingMessage} />
           </div>
         )}
 
-        <Table>
+        <Table className="rounded-md">
           <TableHeader>
             <TableRow>
               {/* Selection column */}
