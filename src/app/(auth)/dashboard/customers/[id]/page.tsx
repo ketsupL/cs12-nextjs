@@ -9,6 +9,9 @@ import {
 } from "@/components/customers/customer-detail";
 import { getCustomerById } from "@/services/customers";
 import { headers } from "next/headers";
+import { getEstimatesById } from "@/services/estimates";
+import { getInvoicesById } from "@/services/invoices";
+import { getJobsById } from "@/services/jobs";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -20,9 +23,15 @@ export default async function CustomerDetailPage(
 ) {
   const { id } = await params;
   const { category } = await searchParams;
-  const cookieHeader = (await headers()).get("cookie"); // browser cookies
+  const cookieHeader = (await headers()).get("cookie") as string; // browser cookies
   // Fetch customer, locations, and merged customers data
-  const customer = await getCustomerById(id, cookieHeader as string);
+  const [customer, estimates, jobs, invoices] = await Promise.all([
+    getCustomerById(id, cookieHeader),
+    getEstimatesById(id, cookieHeader),
+    getJobsById(id, cookieHeader),
+    getInvoicesById(id, cookieHeader),
+  ]);
+
   console.log(category);
   if (customer.data == null || customer.status === "error") {
     return (
@@ -85,7 +94,7 @@ export default async function CustomerDetailPage(
 
         {/* Right Content - Tabs */}
         <div className="flex-1 bg-gray-50 overflow-y-auto">
-          <CustomerTabs />
+          <CustomerTabs category={category} />
         </div>
       </div>
     </div>

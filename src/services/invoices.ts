@@ -1,6 +1,10 @@
 import { SortableInvoiceColumn } from "@/hooks/useInvoice";
 import axios from "@/lib/axios";
-import { InvoiceAdd, PaginatedInvoiceResponse } from "@/types/invoices";
+import {
+  Invoice,
+  InvoiceAdd,
+  PaginatedInvoiceResponse,
+} from "@/types/invoices";
 import { jsonResponse, JsonResponse } from "@/utils/response";
 
 export async function getInvoicesByPagination(
@@ -35,6 +39,25 @@ export async function getInvoicesByPagination(
   });
 }
 
+export async function getInvoicesById(
+  id: number,
+  cookieHeader: string
+): Promise<JsonResponse<Invoice[] | null>> {
+  const res = await axios.get(`/api/invoices/${id}`, {
+    headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to update customer",
+    });
+  }
+  return jsonResponse({
+    data: res.data,
+    status: "success",
+  });
+}
 export async function createInvoice(formData: InvoiceAdd, customerId: number) {
   const res = await axios.post(`/api/invoices/${customerId}`, formData);
   if (res.status !== 200) {

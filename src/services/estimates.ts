@@ -1,6 +1,10 @@
 import { SortableEstimateColumn } from "@/hooks/useEstimates";
 import axios from "@/lib/axios";
-import { EstimateAdd, PaginatedEstimateResponse } from "@/types/estimates";
+import {
+  Estimate,
+  EstimateAdd,
+  PaginatedEstimateResponse,
+} from "@/types/estimates";
 import { JsonResponse, jsonResponse } from "@/utils/response";
 
 export async function getEstimatesByPagination(
@@ -104,6 +108,26 @@ export async function deleteEstimates(
   }
   return jsonResponse({
     data: null,
+    status: "success",
+  });
+}
+
+export async function getEstimatesById(
+  id: number,
+  cookieHeader: string
+): Promise<JsonResponse<Estimate[] | null>> {
+  const res = await axios.get(`/api/estimates/${id}`, {
+    headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to update customer",
+    });
+  }
+  return jsonResponse({
+    data: res.data,
     status: "success",
   });
 }

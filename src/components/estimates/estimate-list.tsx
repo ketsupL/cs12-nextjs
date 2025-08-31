@@ -92,7 +92,7 @@ export function EstimatesList() {
             }}
             href={{
               pathname: `customers/${estimate.customer?.id}`,
-              query: { category: "estimate" },
+              query: { category: "estimates" },
             }}
             className="font-medium hover:underline"
           >

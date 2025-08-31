@@ -1,6 +1,6 @@
 import { SortableJobColumn } from "@/hooks/useJobs";
 import axios from "@/lib/axios";
-import { JobAdd, PaginatedJobResponse } from "@/types/jobs";
+import { Job, JobAdd, PaginatedJobResponse } from "@/types/jobs";
 import { jsonResponse, JsonResponse } from "@/utils/response";
 
 export async function getJobsByPagination(
@@ -31,6 +31,27 @@ export async function getJobsByPagination(
 
   return jsonResponse<PaginatedJobResponse>({
     data: res.data as PaginatedJobResponse,
+    status: "success",
+  });
+}
+
+
+export async function getJobsById(
+  id: number,
+  cookieHeader: string
+): Promise<JsonResponse<Job[] | null>> {
+  const res = await axios.get(`/api/invoices/${id}`, {
+    headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to update customer",
+    });
+  }
+  return jsonResponse({
+    data: res.data,
     status: "success",
   });
 }

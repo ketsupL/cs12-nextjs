@@ -89,7 +89,7 @@ export function InvoicesList() {
             }}
             href={{
               pathname: `customers/${invoice.customer?.id}`,
-              query: { category: "invoice" },
+              query: { category: "invoices" },
             }}
             className="font-medium hover:underline"
           >

@@ -79,7 +79,7 @@ export function JobsList() {
             }}
             href={{
               pathname: `customers/${job.customer?.id}`,
-              query: { category: "job" },
+              query: { category: "jobs" },
             }}
             className="font-medium hover:underline"
           >
