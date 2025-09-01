@@ -160,11 +160,11 @@ export default function EstimateTab({
                       {getStatusBadge(estimate.status)}
                     </div>
 
-                    <div className="mb-3">
+                    <div className="mt-2 mb-3">
                       <p className="text-xs font-medium text-gray-700 mb-1">
                         Tasks:
                       </p>
-                      <div className="space-y-1 mr-2">
+                      <div className="space-y-1 mr-5">
                         {estimate.tasks.map((task, index) => (
                           <div
                             key={index}
@@ -202,11 +202,12 @@ export default function EstimateTab({
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col items-end gap-1 ">
                     <span className="text-lg font-bold text-gray-900">
                       {currencyCharacter}
-                      {estimate.tasks_total_price}
+                      {Number(estimate.tasks_total_price).toLocaleString(undefined)}
                     </span>
+                    <span className="text-sm font-medium"> EST-{estimate.id}</span>
                   </div>
                 </div>
               </div>

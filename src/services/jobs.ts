@@ -40,7 +40,7 @@ export async function getJobsById(
   id: number,
   cookieHeader: string
 ): Promise<JsonResponse<Job[] | null>> {
-  const res = await axios.get(`/api/invoices/${id}`, {
+  const res = await axios.get(`/api/jobs/${id}`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {

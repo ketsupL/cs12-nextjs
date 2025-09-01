@@ -67,7 +67,8 @@ export function AddJobForm({
 
     try {
       // Validate required fields
-      if (!formData.job_name || !formData.status || formData.due_date) {
+      console.log(formData);
+      if (!formData.job_name || !formData.status || !formData.due_date) {
         toast.error("Please fill in all required fields");
         setIsSubmitting(false);
         return;

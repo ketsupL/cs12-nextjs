@@ -59,7 +59,7 @@ export function InfoJob({
               <span className="text-sm font-regular text-neutral-600">
                 Job ID
               </span>
-              <span className="text-lg font-medium">EST-{job.id}</span>
+              <span className="text-lg font-medium">JOB-{job.id}</span>
             </div>
             <div className="flex flex-col items-start">
               <span

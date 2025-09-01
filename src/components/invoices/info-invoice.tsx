@@ -67,7 +67,7 @@ export function InfoInvoice({
               <span className="text-sm font-regular text-neutral-600">
                 Invoice ID
               </span>
-              <span className="text-lg font-medium">EST-{invoice.id}</span>
+              <span className="text-lg font-medium">INV-{invoice.id}</span>
             </div>
             <div className="flex flex-col items-start">
               <span

@@ -10,6 +10,10 @@ import EstimateTab from "./estimate-tab";
 import { Customer } from "@/types/database";
 import useSWR from "swr";
 import { getEstimatesById } from "@/services/estimates";
+import { getJobsById } from "@/services/jobs";
+import JobTab from "./job-tab";
+import { getInvoicesById } from "@/services/invoices";
+import InvoiceTab from "./invoice-tab";
 
 type CustomerTabsProps = {
   category: string;
@@ -41,6 +45,19 @@ export function CustomerTabs({
   } = useSWR(`/api/estimates/${id}`, () =>
     getEstimatesById(Number(id), cookieHeader)
   );
+  const {
+    data: jobs,
+    mutate: mutateJobs,
+    isValidating: isJobValidating,
+  } = useSWR(`/api/jobs/${id}`, () => getJobsById(Number(id), cookieHeader));
+  const {
+    data: invoices,
+    mutate: mutateInvoices,
+    isValidating: isInvoiceValidating,
+  } = useSWR(`/api/invoices/${id}`, () =>
+    getInvoicesById(Number(id), cookieHeader)
+  );
+  console.log(invoices)
   return (
     <div className="h-full flex flex-col">
       <Tabs
@@ -68,71 +85,19 @@ export function CustomerTabs({
           customer={customer}
           isValidating={isEstimateValidating}
         />
-        <TabsContent
-          value="jobs"
-          className="flex-1 p-6 space-y-6 overflow-y-auto"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Jobs</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Manage all jobs and appointments for this customer
-              </p>
-            </div>
-            <Button size="sm">
-              <Calendar className="mr-2 h-4 w-4" />
-              Create Job
-            </Button>
-          </div>
+        <JobTab
+          jobs={jobs?.data}
+          customer={customer}
+          isValidating={isJobValidating}
+          mutate={mutateJobs}
+        />
 
-          <Card>
-            <CardContent className="p-0 min-h-75">
-              <EmptyState
-                icon={Calendar}
-                title="No jobs yet"
-                description="Create your first job to start scheduling work for this customer."
-                action={{
-                  label: "Create Job",
-                  onClick: () => console.log("Create job"),
-                  icon: Plus,
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent
-          value="invoices"
-          className="flex-1 p-6 space-y-6 overflow-y-auto"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Invoices</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Track all invoices and payment history
-              </p>
-            </div>
-            <Button size="sm">
-              <Receipt className="mr-2 h-4 w-4" />
-              Create Invoice
-            </Button>
-          </div>
-
-          <Card>
-            <CardContent className="p-0 min-h-75">
-              <EmptyState
-                icon={Receipt}
-                title="No invoices yet"
-                description="Create invoices to bill your customer for completed work."
-                action={{
-                  label: "Create Invoice",
-                  onClick: () => console.log("Create invoice"),
-                  icon: Plus,
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <InvoiceTab
+          invoices={invoices?.data}
+          customer={customer}
+          isValidating={isInvoiceValidating}
+          mutate={mutateInvoices}
+        />
       </Tabs>
     </div>
   );

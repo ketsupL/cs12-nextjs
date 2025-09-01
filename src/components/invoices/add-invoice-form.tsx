@@ -106,7 +106,9 @@ export function AddInvoiceForm({
       const parsedData: InvoiceAdd = {
         ...formData,
         paid_amount:
-          formData.paid_amount === "" ? "0.00" : formData.paid_amount,
+          formData.paid_amount === ""
+            ? "0.00"
+            : formData.paid_amount.replace(/,/g, ""),
       };
       const response = await createInvoice(parsedData, Number(customer.id));
       if (response.status === "error") {

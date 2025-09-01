@@ -41,7 +41,7 @@ export function EditJobForm({
   // Get locations from useCustomers hook
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  console.log(job.due_date)
+  console.log(job.id)
   const [formData, setFormData] = useState<JobAdd>({
     job_name: job.job_name,
     status: job.status,
@@ -49,6 +49,7 @@ export function EditJobForm({
     due_date: job.due_date,
     notes: job.notes,
   });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {

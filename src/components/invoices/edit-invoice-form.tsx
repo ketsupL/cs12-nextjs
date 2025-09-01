@@ -107,7 +107,9 @@ export function EditInvoiceForm({
       const parsedData: InvoiceAdd = {
         ...formData,
         paid_amount:
-          formData.paid_amount === "" ? "0.00" : formData.paid_amount,
+          formData.paid_amount === ""
+            ? "0.00"
+            : formData.paid_amount.replace(/,/g, ""),
       };
       const response = await editInvoice(parsedData, Number(invoice.id), [
         ...deletedIdSet,
