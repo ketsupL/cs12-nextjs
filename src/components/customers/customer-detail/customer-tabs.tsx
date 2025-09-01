@@ -4,22 +4,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "./empty-state";
-import {
-  Calendar,
-  FileText,
-  Receipt,
-  MessageSquare,
-  Plus,
-  Activity,
-  ClipboardList,
-} from "lucide-react";
+import { Calendar, FileText, Receipt, Plus } from "lucide-react";
 import { useState } from "react";
+import EstimateTab from "./estimate-tab";
+import { Customer } from "@/types/database";
+import useSWR from "swr";
+import { getEstimatesById } from "@/services/estimates";
 
 type CustomerTabsProps = {
   category: string;
+  id: string;
+  cookieHeader: string;
+  customer: Customer;
 };
 
-export function CustomerTabs({ category }: CustomerTabsProps) {
+export function CustomerTabs({
+  category,
+  id,
+  cookieHeader,
+  customer,
+}: CustomerTabsProps) {
   const tabs = [
     { value: "estimates", label: "Estimates", icon: FileText },
     { value: "jobs", label: "Jobs", icon: Calendar },
@@ -30,12 +34,19 @@ export function CustomerTabs({ category }: CustomerTabsProps) {
     : "estimates";
   const [activeTab, setActiveTab] = useState(initialTab);
 
+  const {
+    data: estimates,
+    mutate: mutateEstimates,
+    isValidating: isEstimateValidating,
+  } = useSWR(`/api/estimates/${id}`, () =>
+    getEstimatesById(Number(id), cookieHeader)
+  );
   return (
     <div className="h-full flex flex-col">
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="h-full flex flex-col"
+        className="h-full flex flex-col relative"
       >
         <div className="border-b bg-white px-6 py-4">
           <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
@@ -51,7 +62,12 @@ export function CustomerTabs({ category }: CustomerTabsProps) {
             ))}
           </TabsList>
         </div>
-
+        <EstimateTab
+          estimates={estimates ? estimates.data : estimates}
+          mutate={mutateEstimates}
+          customer={customer}
+          isValidating={isEstimateValidating}
+        />
         <TabsContent
           value="jobs"
           className="flex-1 p-6 space-y-6 overflow-y-auto"
@@ -70,7 +86,7 @@ export function CustomerTabs({ category }: CustomerTabsProps) {
           </div>
 
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 min-h-75">
               <EmptyState
                 icon={Calendar}
                 title="No jobs yet"
@@ -78,39 +94,6 @@ export function CustomerTabs({ category }: CustomerTabsProps) {
                 action={{
                   label: "Create Job",
                   onClick: () => console.log("Create job"),
-                  icon: Plus,
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent
-          value="estimates"
-          className="flex-1 p-6 space-y-6 overflow-y-auto"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Estimates</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                View and manage all estimates and quotes
-              </p>
-            </div>
-            <Button size="sm">
-              <FileText className="mr-2 h-4 w-4" />
-              Create Estimate
-            </Button>
-          </div>
-
-          <Card>
-            <CardContent className="p-0">
-              <EmptyState
-                icon={FileText}
-                title="No estimates yet"
-                description="Create estimates to provide quotes for your customer's projects."
-                action={{
-                  label: "Create Estimate",
-                  onClick: () => console.log("Create estimate"),
                   icon: Plus,
                 }}
               />
@@ -136,7 +119,7 @@ export function CustomerTabs({ category }: CustomerTabsProps) {
           </div>
 
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 min-h-75">
               <EmptyState
                 icon={Receipt}
                 title="No invoices yet"

@@ -12,6 +12,7 @@ import { headers } from "next/headers";
 import { getEstimatesById } from "@/services/estimates";
 import { getInvoicesById } from "@/services/invoices";
 import { getJobsById } from "@/services/jobs";
+import { SWRConfig } from "swr";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -31,7 +32,7 @@ export default async function CustomerDetailPage(
     getJobsById(id, cookieHeader),
     getInvoicesById(id, cookieHeader),
   ]);
-
+  console.log(jobs, invoices, estimates);
   console.log(category);
   if (customer.data == null || customer.status === "error") {
     return (
@@ -75,28 +76,48 @@ export default async function CustomerDetailPage(
   return (
     <div className="flex flex-col h-screen">
       {/* Top Header Bar */}
-      <div className="border-b bg-white">
-        {/* Breadcrumb Navigation */}
-        <PageBreadcrumb items={breadcrumbItems} />
+      <SWRConfig
+        value={{
+          fallback: {
+            [`/api/customers/${id}`]: customer,
+            [`/api/estimates/${id}`]: estimates,
+            [`/api/jobs/${id}`]: jobs,
+            [`/api/invoices/${id}`]: invoices,
+          },
+          // Disable all automatic revalidation
+          revalidateOnFocus: false,
+          revalidateOnReconnect: false,
+          revalidateIfStale: false,
+        }}
+      >
+        <div className="border-b bg-white">
+          {/* Breadcrumb Navigation */}
+          <PageBreadcrumb items={breadcrumbItems} />
 
-        {/* Stats Bar */}
-        <div className="px-6 py-4">
-          <CustomerStats />
-        </div>
-      </div>
-
-      {/* Main Content Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Customer Info */}
-        <div className="w-80 border-r bg-white overflow-y-auto">
-          <CustomerHeader customer={customer.data} />
+          {/* Stats Bar */}
+          <div className="px-6 py-4">
+            <CustomerStats />
+          </div>
         </div>
 
-        {/* Right Content - Tabs */}
-        <div className="flex-1 bg-gray-50 overflow-y-auto">
-          <CustomerTabs category={category} />
+        {/* Main Content Layout */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Sidebar - Customer Info */}
+          <div className="w-80 border-r bg-white overflow-y-auto">
+            <CustomerHeader customer={customer.data} />
+          </div>
+
+          {/* Right Content - Tabs */}
+          <div className="flex-1 bg-gray-50 overflow-y-auto">
+            <CustomerTabs
+              category={category}
+              customer={customer?.data}
+              cookieHeader={cookieHeader}
+              id={id as string}
+            />
+          </div>
         </div>
-      </div>
+      </SWRConfig>
     </div>
   );
 }
