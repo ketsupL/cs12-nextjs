@@ -179,3 +179,27 @@ export async function getConvertionRate(
     status: "success",
   });
 }
+
+export type ChartLead = {
+  day: string; // e.g. "2025-06-03"
+  sources: Record<string, number>; // dynamic keys: "Cold Outreach", "Other", etc.
+};
+
+export async function getChartLeadGeneration(
+  cookieHeader: string
+): Promise<JsonResponse<ChartLead[] | null>> {
+  const res = await axios.get(`/api/leads/analytics/getChartLeadGeneration`, {
+    headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
+  });
+  if (res.status !== 200) {
+    return jsonResponse({
+      data: null,
+      status: "error",
+      message: "Failed to update customer",
+    });
+  }
+  return jsonResponse({
+    data: res.data,
+    status: "success",
+  });
+}
