@@ -26,7 +26,9 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ChartLead } from "@/services/leads";
-
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { CSVLink } from "react-csv";
 export const description = "An interactive area chart";
 
 const chartConfig = {
@@ -86,11 +88,11 @@ export function ChartAreaInteractive({
   chartLead: ChartLead[] | null;
 }) {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const [timeRange, setTimeRange] = React.useState("90");
   const chartData = chartLead;
   React.useEffect(() => {
     if (isMobile) {
-      setTimeRange("7d");
+      setTimeRange("7");
     }
   }, [isMobile]);
 
@@ -102,12 +104,8 @@ export function ChartAreaInteractive({
       Math.max(...chartData.map((d) => new Date(d.day).getTime()))
     );
 
-    let daysToSubtract = 90;
-    if (timeRange === "30d") daysToSubtract = 30;
-    if (timeRange === "7d") daysToSubtract = 7;
-
     const startDate = new Date(referenceDate);
-    startDate.setDate(referenceDate.getDate() - daysToSubtract);
+    startDate.setDate(referenceDate.getDate() - Number(timeRange));
 
     // filter by date + flatten sources
     return chartData
@@ -136,158 +134,221 @@ export function ChartAreaInteractive({
   console.log(filteredData);
   if (!chartLead) return;
   return (
-    <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>Total Conversion</CardTitle>
-        <CardDescription>
-          <span className="hidden @[540px]/card:block">
-            for the last 3 months
-          </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
-        </CardDescription>
-        <CardAction>
-          <ToggleGroup
-            type="single"
-            value={timeRange}
-            onValueChange={setTimeRange}
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
-          >
-            <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
-            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
-            <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
-          </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
-              size="sm"
-              aria-label="Select a value"
+    <>
+      <Card className="@container/card">
+        <CardHeader>
+          <CardTitle>Total Conversion</CardTitle>
+          <CardDescription>
+            <span className="hidden @[540px]/card:block">
+              for the last 3 months
+            </span>
+            <span className="@[540px]/card:hidden">Last 3 months</span>
+          </CardDescription>
+          <CardAction>
+            <ToggleGroup
+              type="single"
+              value={timeRange}
+              defaultValue="90"
+              onValueChange={(val) => {
+                if (val) setTimeRange(val);
+              }}
+              variant="outline"
+              className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
             >
-              <SelectValue placeholder="Last 3 months" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="90d" className="rounded-lg">
-                Last 3 months
-              </SelectItem>
-              <SelectItem value="30d" className="rounded-lg">
-                Last 30 days
-              </SelectItem>
-              <SelectItem value="7d" className="rounded-lg">
-                Last 7 days
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <AreaChart data={filteredData}>
-            <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={1.0}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                return value.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-              }}
-            />
-            <ChartTooltip
-              cursor={false}
-              defaultIndex={isMobile ? 1 : 10}
-              content={({ label, payload }) => {
-                if (!payload?.length) return null;
+              <ToggleGroupItem value={"90"}>Last 3 months</ToggleGroupItem>
+              <ToggleGroupItem value={"30"}>Last 30 days</ToggleGroupItem>
+              <ToggleGroupItem value={"7"}>Last 7 days</ToggleGroupItem>
+            </ToggleGroup>
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger
+                className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
+                size="sm"
+                aria-label="Select a value"
+              >
+                <SelectValue placeholder="Last 3 months" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="90" className="rounded-lg">
+                  Last 3 months
+                </SelectItem>
+                <SelectItem value="30" className="rounded-lg">
+                  Last 30 days
+                </SelectItem>
+                <SelectItem value="7" className="rounded-lg">
+                  Last 7 days
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </CardAction>
+        </CardHeader>
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[250px] w-full"
+          >
+            <AreaChart data={filteredData}>
+              <defs>
+                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-desktop)"
+                    stopOpacity={1.0}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-desktop)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-mobile)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-mobile)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  return value.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+              />
+              <ChartTooltip
+                cursor={false}
+                defaultIndex={isMobile ? 1 : 10}
+                content={({ label, payload }) => {
+                  if (!payload?.length) return null;
 
-                const data = payload[0].payload; // row from filteredData
+                  const data = payload[0].payload; // row from filteredData
 
-                // Define colors per source
-                const sourceColors = Object.fromEntries(
-                  Object.entries(chartConfig).map(([key, { label, color }]) => [
-                    key,
-                    { label, color },
-                  ])
-                ) as Record<string, { label: string; color: string }>;
-                return (
-                  <div className="rounded-lg border bg-white p-2 shadow-md">
-                    <div className="font-medium">
-                      {new Date(label as string).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </div>
-                    <div className="mt-1 space-y-1 text-sm">
-                      {Object.entries(data)
-                        .filter(([key]) => key !== "day" && key !== "date")
-                        .map(([key, value]) => {
-                          const color =
-                            sourceColors[key] ?? "var(--color-fallback)";
-                          return (
-                            <div
-                              key={key}
-                              className="flex justify-between items-cente1 gap-3"
-                            >
-                              <span className="flex items-center gap-2">
-                                <span
-                                  className="h-2 w-2 rounded-full"
-                                  style={{ backgroundColor: color.color }}
-                                />
-                                {key.replace(/_/g, " ")}
-                              </span>
-                              <span className="font-medium">
-                                {value as number}
-                              </span>
-                            </div>
-                          );
+                  // Define colors per source
+                  const sourceColors = Object.fromEntries(
+                    Object.entries(chartConfig).map(
+                      ([key, { label, color }]) => [key, { label, color }]
+                    )
+                  ) as Record<string, { label: string; color: string }>;
+                  return (
+                    <div className="rounded-lg border bg-white p-2 shadow-md">
+                      <div className="font-medium">
+                        {new Date(label as string).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
                         })}
+                      </div>
+                      <div className="mt-1 space-y-1 text-sm">
+                        {Object.entries(data)
+                          .filter(([key]) => key !== "day" && key !== "date")
+                          .map(([key, value]) => {
+                            const color =
+                              sourceColors[key] ?? "var(--color-fallback)";
+                            return (
+                              <div
+                                key={key}
+                                className="flex justify-between items-cente1 gap-3"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span
+                                    className="h-2 w-2 rounded-full"
+                                    style={{ backgroundColor: color.color }}
+                                  />
+                                  {key.replace(/_/g, " ")}
+                                </span>
+                                <span className="font-medium">
+                                  {value as number}
+                                </span>
+                              </div>
+                            );
+                          })}
+                      </div>
                     </div>
-                  </div>
-                );
-              }}
-            />
+                  );
+                }}
+              />
 
-            <Area
-              dataKey="Total"
-              type="natural"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+              <Area
+                dataKey="Total"
+                type="natural"
+                fill="url(#fillDesktop)"
+                stroke="var(--color-desktop)"
+                stackId="a"
+              />
+            </AreaChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+      <DownloadButton chartLead={chartLead} />
+    </>
+  );
+}
+
+interface CSVLinkRef extends HTMLAnchorElement {
+  link: HTMLAnchorElement | null;
+}
+function DownloadButton({ chartLead }: { chartLead: ChartLead[] }) {
+  const csvLinkRef = React.useRef<CSVLinkRef | null>(null);
+  const csvHeaders = [
+    { key: "date", label: "Date" },
+    { key: "advertisement", label: "Advertisement" },
+    { key: "coldOutreach", label: "Cold Outreach" },
+    { key: "emailCampaign", label: "Email Campaign" },
+    { key: "phoneCall", label: "Phone Call" },
+    { key: "referral", label: "Referral" },
+    { key: "socialMedia", label: "Social Media" },
+    { key: "tradeShow", label: "Trade Show" },
+    { key: "website", label: "Website" },
+    { key: "other", label: "Other" },
+    { key: "total", label: "Total" },
+  ];
+  const filteredData = React.useMemo(() => {
+    return chartLead.map((lead) => {
+      return {
+        date: lead.day,
+        advertisement: lead.sources["Advertisement"] ?? 0,
+        coldOutreach: lead.sources["Cold Outreach"] ?? 0,
+        emailCampaign: lead.sources["Email Campaign"] ?? 0,
+        phoneCall: lead.sources["Phone Call"] ?? 0,
+        referral: lead.sources["Referral"] ?? 0,
+        socialMedia: lead.sources["Social Media"] ?? 0,
+        tradeShow: lead.sources["Trade Show"] ?? 0,
+        website: lead.sources["Website"] ?? 0,
+        other: lead.sources["Other"] ?? 0,
+        total: lead.sources["Total"] ?? 0,
+      };
+    });
+  }, [chartLead]);
+  console.log(filteredData);
+  return (
+    <Button
+      variant={"default"}
+      type="button"
+      className=" ml-auto shadow-2xs text-md
+        shadow-accent border border-accent"
+      onClick={()=>csvLinkRef.current?.link?.click()}
+    >
+      <Download className="size-5" />
+      Download
+      <CSVLink
+        ref={csvLinkRef}
+        className="hidden"
+        headers={csvHeaders}
+        filename="analyticsData.csv"
+        data={filteredData}
+        target="_blank"
+      ></CSVLink>
+    </Button>
   );
 }
