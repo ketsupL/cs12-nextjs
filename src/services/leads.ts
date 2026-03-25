@@ -1,5 +1,6 @@
 import { SortableLeadColumn } from "@/hooks/useLeads";
 import axios from "@/lib/axios";
+import axiosServerSide from "@/lib/axios.server";
 import {
   CreateLeadData,
   Lead,
@@ -140,7 +141,7 @@ type NewLeads = {
 export async function getNewLeads(
   cookieHeader: string
 ): Promise<JsonResponse<NewLeads | null>> {
-  const res = await axios.get(`/api/leads/analytics/getNewLeads`, {
+  const res = await axiosServerSide.get(`/api/leads/analytics/getNewLeads`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {
@@ -164,7 +165,7 @@ type ConvertionRate = {
 export async function getConvertionRate(
   cookieHeader: string
 ): Promise<JsonResponse<ConvertionRate | null>> {
-  const res = await axios.get(`/api/leads/analytics/getConvertionRate`, {
+  const res = await axiosServerSide.get(`/api/leads/analytics/getConvertionRate`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {
@@ -188,7 +189,7 @@ export type ChartLead = {
 export async function getChartLeadGeneration(
   cookieHeader: string
 ): Promise<JsonResponse<ChartLead[] | null>> {
-  const res = await axios.get(`/api/leads/analytics/getChartLeadGeneration`, {
+  const res = await axiosServerSide.get(`/api/leads/analytics/getChartLeadGeneration`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {

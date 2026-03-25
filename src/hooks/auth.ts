@@ -53,6 +53,7 @@ export const useAuth = ({
       .post("/login", props)
       .then(() => mutate())
       .catch((error) => {
+        console.log(error)
         if (error.response.status !== 422) throw error;
 
         setErrors(error.response.data.errors);

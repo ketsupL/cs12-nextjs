@@ -1,5 +1,6 @@
 import { SortableEstimateColumn } from "@/hooks/useEstimates";
 import axios from "@/lib/axios";
+import axiosServerSide from "@/lib/axios.server";
 import {
   Estimate,
   EstimateAdd,
@@ -116,7 +117,7 @@ export async function getEstimatesById(
   id: number,
   cookieHeader: string
 ): Promise<JsonResponse<Estimate[] | null>> {
-  const res = await axios.get(`/api/estimates/${id}`, {
+  const res = await axiosServerSide.get(`/api/estimates/${id}`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {

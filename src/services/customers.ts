@@ -1,5 +1,6 @@
 import { SortableTableColumn } from "@/hooks/useCustomers";
 import axios from "@/lib/axios";
+import axiosServerSide from "@/lib/axios.server";
 import { CustomerAdd, PaginatedCustomerResponse } from "@/types/customers";
 import { Customer } from "@/types/database";
 import { jsonResponse, JsonResponse } from "@/utils/response";
@@ -93,7 +94,7 @@ export async function getCustomerById(
   id: number,
   cookieHeader: string
 ): Promise<JsonResponse<Customer | null>> {
-  const res = await axios.get(`/api/customers/${id}`, {
+  const res = await axiosServerSide.get(`/api/customers/${id}`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {
@@ -134,7 +135,7 @@ type NewCustomers = {
 export async function getNewCustomers(
   cookieHeader: string
 ): Promise<JsonResponse<NewCustomers | null>> {
-  const res = await axios.get(`/api/customers/analytics/getNewCustomers`, {
+  const res = await axiosServerSide.get(`/api/customers/analytics/getNewCustomers`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {

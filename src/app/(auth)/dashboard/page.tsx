@@ -5,7 +5,7 @@ import { getChartLeadGeneration } from "@/services/leads";
 import { headers } from "next/headers";
 
 export default async function Home() {
-  const cookieHeader = (await headers()).get("cookie") as string; // browser cookies
+  const cookieHeader = (await headers()).get("cookie") ?? ""; // browser cookies
   const chartData = await getChartLeadGeneration(cookieHeader);
   console.log(chartData);
   return (

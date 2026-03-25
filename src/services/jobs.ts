@@ -1,5 +1,6 @@
 import { SortableJobColumn } from "@/hooks/useJobs";
 import axios from "@/lib/axios";
+import axiosServerSide from "@/lib/axios.server";
 import { Job, JobAdd, PaginatedJobResponse } from "@/types/jobs";
 import { jsonResponse, JsonResponse } from "@/utils/response";
 
@@ -40,7 +41,7 @@ export async function getJobsById(
   id: number,
   cookieHeader: string
 ): Promise<JsonResponse<Job[] | null>> {
-  const res = await axios.get(`/api/jobs/${id}`, {
+  const res = await axiosServerSide.get(`/api/jobs/${id}`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {

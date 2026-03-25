@@ -1,5 +1,6 @@
 import { SortableInvoiceColumn } from "@/hooks/useInvoice";
 import axios from "@/lib/axios";
+import axiosServerSide from "@/lib/axios.server";
 import {
   Invoice,
   InvoiceAdd,
@@ -43,7 +44,7 @@ export async function getInvoicesById(
   id: number,
   cookieHeader: string
 ): Promise<JsonResponse<Invoice[] | null>> {
-  const res = await axios.get(`/api/invoices/${id}`, {
+  const res = await axiosServerSide.get(`/api/invoices/${id}`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {
@@ -136,7 +137,7 @@ type LastMontRevenue = {
 export async function getLastMonthRevenue(
   cookieHeader: string
 ): Promise<JsonResponse<LastMontRevenue | null>> {
-  const res = await axios.get(`/api/invoices/analytics/getLastMonthRevenue`, {
+  const res = await axiosServerSide.get(`/api/invoices/analytics/getLastMonthRevenue`, {
     headers: { Cookie: cookieHeader, Referer: process.env.FRONTEND_URL },
   });
   if (res.status !== 200) {
