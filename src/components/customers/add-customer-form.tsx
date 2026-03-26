@@ -187,6 +187,7 @@ export function AddCustomerForm({
                   type="email"
                   value={formData.email || ""}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div className="space-y-2">
