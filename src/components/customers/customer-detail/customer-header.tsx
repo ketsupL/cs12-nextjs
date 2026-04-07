@@ -26,6 +26,11 @@ import {
   ChevronDown,
   CheckCircle2,
   Navigation,
+  UserPlus, 
+  ShieldCheck, 
+  Link2,
+  User,     // Added missing icon
+  Unlink    // Added missing icon
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -34,17 +39,29 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
+import { Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
+import { Command, 
+  CommandEmpty, 
+  CommandGroup, 
+  CommandInput, 
+  CommandItem } from "@/components/ui/command";
 import { EditCustomerForm } from "@/components/customers/edit-customer-form";
 import toast from "react-hot-toast";
 import DeleteCustomerForm from "./delete-customer-form";
 
-interface CustomerHeaderProps {
-  customer: Customer;
-}
-
 export function CustomerHeader({ customer }: CustomerHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [customerData, setCustomerData] = useState(customer);
+  
+  // --- New State for the User Selector ---
+  const [userPickerOpen, setUserPickerOpen] = useState(false);
+  const [addressesOpen, setAddressesOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+
   const getInitials = () => {
     return `${customerData.first_name?.[0] || ""}${
       customerData.last_name?.[0] || ""
@@ -64,7 +81,6 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
   const handleEditComplete = (customer: Customer) => {
     setEditModalOpen(false);
     setEditingCustomer(null);
-    console.log(customerData)
     setCustomerData({ ...customer });
   };
 
@@ -76,14 +92,21 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
     });
   };
 
-  const [addressesOpen, setAddressesOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
-
-
   const openInMaps = (address: string) => {
     const encodedAddress = encodeURIComponent(address);
-    window.open(`https://maps.google.com/?q=${encodedAddress}`, "_blank");
+    window.open(`https://maps.google.com/?q=$${encodedAddress}`, "_blank");
+  };
+
+  // --- Dummy Handlers for the Portal Link ---
+  const handleLinkUser = (userId: string) => {
+    console.log("Linking user:", userId);
+    setUserPickerOpen(false);
+    toast.success("User linked successfully!");
+  };
+
+  const handleUnlinkUser = () => {
+    console.log("Unlinking user");
+    toast.success("User unlinked.");
   };
 
   const addressesMatch =
@@ -175,6 +198,93 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
           </div>
         </div>
 
+        <Separator />
+        
+          {/* PORTAL ACCESS COMPONENT */}
+          <div className="space-y-3 px-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                Portal Access
+              </h3>
+              {customerData.user && (
+                <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 text-[10px]">
+                  Linked
+                </Badge>
+              )}
+            </div>
+
+            {!customerData.user ? (
+              <div className="space-y-2">
+                <Popover open={userPickerOpen} onOpenChange={setUserPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between text-xs font-normal h-9 border-dashed"
+                    >
+                      <span>Link user account...</span>
+                      <Link2 className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[280px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search users..." className="h-9" />
+                      <CommandEmpty>
+                        <div className="py-4 text-center">
+                          <p className="text-xs text-gray-500">No user found.</p>
+                          <Button variant="link" size="sm" className="text-xs mt-1">
+                            <UserPlus className="mr-1 h-3 w-3" /> Create new user
+                          </Button>
+                        </div>
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {/* Static mock data for now */}
+                        <CommandItem
+                          onSelect={() => handleLinkUser("123")}
+                          className="text-xs cursor-pointer"
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium">Nicolette Buckridge</span>
+                            <span className="text-gray-500">nicolette.b@gmail.com</span>
+                          </div>
+                        </CommandItem>
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <p className="text-[11px] text-gray-500 leading-tight px-1">
+                  Linking allows the customer to log in and view their estimates, jobs, and invoices.
+                </p>
+              </div>
+            ) : (
+              /* LINKED STATE */
+              <div className="flex items-center justify-between p-2 rounded-lg border bg-gray-50/50">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-xs font-medium truncate">
+                      {customerData.user.name}
+                    </span>
+                    <span className="text-[10px] text-gray-500 truncate">
+                      {customerData.user.email}
+                    </span>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-7 w-7 text-gray-400 hover:text-destructive"
+                  onClick={handleUnlinkUser}
+                >
+                  <Unlink className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            )}
+          </div>
+          
         <Separator />
 
         {/* Contact Information */}
@@ -285,12 +395,8 @@ export function CustomerHeader({ customer }: CustomerHeaderProps) {
                 </p>
               </div>
             )}
-
-            {/* Alternative Addresses from Merged Customers */}
           </CollapsibleContent>
         </Collapsible>
-
-        {/* Additional Contacts Section */}
       </div>
 
       {/* Edit Customer Modal */}
